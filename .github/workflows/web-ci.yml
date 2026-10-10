@@ -4,9 +4,15 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - apps/web/**
+      - .github/workflows/web-ci.yml
   push:
     branches:
       - main
+    paths:
+      - apps/web/**
+      - .github/workflows/web-ci.yml
 
 permissions:
   contents: read
@@ -16,34 +22,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  changes:
-    name: Changes
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      pull-requests: read
-
-    outputs:
-      web: ${{ steps.filter.outputs.web }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Filter
-        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
-        id: filter
-        with:
-          filters: |
-            web:
-              - apps/web/**
-              - .github/workflows/web-ci.yml
-
   format:
     name: Format
-    needs: changes
-    if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
 
     defaults:
@@ -74,8 +54,6 @@ jobs:
 
   test:
     name: Test
-    needs: changes
-    if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
 
     defaults:
@@ -109,14 +87,3 @@ jobs:
 
       - name: Test
         run: pnpm test
-
-  status:
-    name: Status
-    needs: [changes, format, test]
-    if: always()
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check results
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-        run: exit 1

@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Notifications Module/">
+    <Project Path="src/SharedTodo.Notifications/SharedTodo.Notifications.csproj" Id="7661ee71-1876-41d6-9c40-0704c0bcb720" />
+  </Folder>
   <Folder Name="/Users Module/">
     <Project Path="src/SharedTodo.Users.Contracts/SharedTodo.Users.Contracts.csproj" Id="8aed7bfb-916e-4e39-919b-1490b98c3081" />
     <Project Path="src/SharedTodo.Users/SharedTodo.Users.csproj" Id="ad613ddb-661d-4f61-93a4-9cb3fd5868cb" />

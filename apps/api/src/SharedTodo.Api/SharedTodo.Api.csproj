@@ -6,6 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SharedTodo.Notifications\SharedTodo.Notifications.csproj" />
     <ProjectReference Include="..\SharedTodo.ServiceDefaults\SharedTodo.ServiceDefaults.csproj" />
     <ProjectReference Include="..\SharedTodo.Users\SharedTodo.Users.csproj" />
   </ItemGroup>

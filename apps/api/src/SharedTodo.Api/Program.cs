@@ -1,5 +1,6 @@
 using SharedTodo.Api.ExceptionHandling;
 using SharedTodo.Api.OpenApi;
+using SharedTodo.Notifications;
 using SharedTodo.ServiceDefaults;
 using SharedTodo.Users;
 
@@ -16,6 +17,7 @@ builder.Services.AddOpenApi(options =>
 });
 
 builder.AddUsersModuleServices();
+builder.AddNotificationsModuleServices();
 
 var app = builder.Build();
 

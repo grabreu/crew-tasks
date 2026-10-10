@@ -1,0 +1,9 @@
+global using System.ComponentModel.DataAnnotations;
+global using System.Threading.Channels;
+global using MailKit.Net.Smtp;
+global using MailKit.Security;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Options;
+global using MimeKit;
