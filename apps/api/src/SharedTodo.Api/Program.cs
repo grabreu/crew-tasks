@@ -1,3 +1,4 @@
+using SharedTodo.Api.Behaviors;
 using SharedTodo.Api.ExceptionHandling;
 using SharedTodo.Api.OpenApi;
 using SharedTodo.Notifications;
@@ -16,6 +17,12 @@ builder.Services.AddOpenApi(options =>
     options.AddDocumentTransformer<OpenApiVersioningTransformer>();
 });
 
+builder.Services.AddMediator(options =>
+{
+    options.ServiceLifetime = ServiceLifetime.Scoped;
+    options.PipelineBehaviors = [typeof(ValidationBehavior<,>)];
+});
+
 builder.AddUsersModuleServices();
 builder.AddNotificationsModuleServices();
 
@@ -30,6 +37,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.MapUsersModuleEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
