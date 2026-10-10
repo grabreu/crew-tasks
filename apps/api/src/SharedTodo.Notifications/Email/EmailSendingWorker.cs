@@ -10,7 +10,10 @@ public class EmailSendingWorker(ChannelEmailQueue queue, IEmailService emailServ
             {
                 await emailService.SendAsync(message, stoppingToken);
 
-                logger.LogInformation("Email sent: {Subject}", message.Subject);
+                if (logger.IsEnabled(LogLevel.Information))
+                {
+                    logger.LogInformation("Email sent: {Subject}", message.Subject);
+                }
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
