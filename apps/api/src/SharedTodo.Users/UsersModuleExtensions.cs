@@ -1,3 +1,4 @@
+using SharedTodo.Users.Common;
 using SharedTodo.Users.Persistence;
 
 namespace SharedTodo.Users;
@@ -7,6 +8,16 @@ public static class UsersModuleExtensions
     public static IHostApplicationBuilder AddUsersModuleServices(this IHostApplicationBuilder builder)
     {
         builder.AddSqlServerDbContext<UsersDbContext>("UsersDb");
+
+        builder.Services.AddDataProtection();
+
+        builder.Services
+            .AddIdentityCore<ApplicationUser>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<UsersDbContext>()
+            .AddDefaultTokenProviders();
 
         return builder;
     }

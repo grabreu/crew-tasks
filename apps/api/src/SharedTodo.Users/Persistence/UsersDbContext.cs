@@ -1,6 +1,8 @@
+using SharedTodo.Users.Common;
+
 namespace SharedTodo.Users.Persistence;
 
-public class UsersDbContext(DbContextOptions<UsersDbContext> options) : DbContext(options)
+public class UsersDbContext(DbContextOptions<UsersDbContext> options) : IdentityUserContext<ApplicationUser, Guid>(options)
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
