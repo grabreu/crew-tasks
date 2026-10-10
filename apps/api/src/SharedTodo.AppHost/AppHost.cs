@@ -6,16 +6,14 @@ var sql = builder.AddSqlServer("sql")
 
 var usersDb = sql.AddDatabase("usersdb");
 
-var jwtSecretKey = builder.AddParameter(
-    "jwt-secret-key",
-    new GenerateParameterDefault { MinLength = 44, Special = false },
-    secret: true,
-    persist: true);
+var mailpit = builder.AddMailPit("mailpit");
 
 builder.AddProject<Projects.SharedTodo_Api>("api")
     .WithReference(usersDb)
-    .WithEnvironment("Jwt__SecretKey", jwtSecretKey)
-    .WaitFor(usersDb);
+    .WithEnvironment("Email__Host", mailpit.Resource.PrimaryEndpoint.Property(EndpointProperty.Host))
+    .WithEnvironment("Email__Port", mailpit.Resource.PrimaryEndpoint.Property(EndpointProperty.Port))
+    .WaitFor(usersDb)
+    .WaitFor(mailpit);
 
 var app = builder.Build();
 
