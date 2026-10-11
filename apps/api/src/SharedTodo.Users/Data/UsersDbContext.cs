@@ -1,6 +1,6 @@
-using SharedTodo.Users.Common;
+using SharedTodo.Users.Identity;
 
-namespace SharedTodo.Users.Persistence;
+namespace SharedTodo.Users.Data;
 
 public class UsersDbContext(DbContextOptions<UsersDbContext> options) : IdentityUserContext<ApplicationUser, Guid>(options)
 {

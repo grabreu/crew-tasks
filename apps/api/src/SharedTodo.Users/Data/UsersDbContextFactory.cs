@@ -1,4 +1,4 @@
-namespace SharedTodo.Users.Persistence;
+namespace SharedTodo.Users.Data;
 
 public class UsersDbContextFactory : IDesignTimeDbContextFactory<UsersDbContext>
 {

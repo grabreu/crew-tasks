@@ -8,4 +8,8 @@
     <PackageReference Include="MailKit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SharedTodo.Users.Contracts\SharedTodo.Users.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

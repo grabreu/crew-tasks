@@ -1,6 +1,6 @@
-using SharedTodo.Users.Common;
+using SharedTodo.Users.Identity;
 
-namespace SharedTodo.Users.Persistence.Configurations;
+namespace SharedTodo.Users.Data.Configurations;
 
 public class ApplicationUserConfiguration : IEntityTypeConfiguration<ApplicationUser>
 {

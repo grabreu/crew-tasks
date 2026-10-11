@@ -1,3 +1,7 @@
+global using Desfecho;
+global using FluentValidation;
+global using Mediator;
+global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Builder;
 global using Microsoft.AspNetCore.Diagnostics;
 global using Microsoft.AspNetCore.Http;
