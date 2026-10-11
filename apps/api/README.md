@@ -27,6 +27,6 @@ Running `SharedTodo.Api` alone also works if you provide the `UsersDb` connectio
 
 ## Other commands
 
-`dotnet build --no-restore` (build), `dotnet format --no-restore --verify-no-changes --severity info` (formatting check), `dotnet test` (no tests yet).
+`dotnet build --no-restore` (build), `dotnet format --no-restore --verify-no-changes --severity info` (formatting check).
 
 EF Core migrations live in `src/SharedTodo.Users/Data/Migrations`; the design-time factory targets `(localdb)\mssqllocaldb`.

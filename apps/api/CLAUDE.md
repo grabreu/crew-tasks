@@ -22,7 +22,6 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
 - `src/SharedTodo.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
 - `src/SharedTodo.AppHost/` - .NET Aspire host for local development: SQL Server container, MailPit, and the API with its configuration.
 - `src/SharedTodo.ServiceDefaults/` - Aspire service defaults (OpenTelemetry, health checks, resilience).
-- `tests/` - test projects (none yet).
 
 Commands, queries and events go through `Mediator` (source generator), results use `Desfecho`; packages are versioned centrally in `Directory.Packages.props`.
 
@@ -30,11 +29,10 @@ Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints`
 
 ### Validation
 
-Run from `apps/api/`: `dotnet restore`, `dotnet build --no-restore -c Release`, `dotnet format --no-restore --verify-no-changes --severity info`, `dotnet test --no-build -c Release` (no test projects yet) before considering a change done.
+Run from `apps/api/`: `dotnet restore`, `dotnet build --no-restore -c Release`, `dotnet format --no-restore --verify-no-changes --severity info` before considering a change done.
 
 ### Open Questions
 
 - TODO: rotated refresh tokens (only short-lived access tokens are issued today).
-- TODO: no tests yet (a `tests/` folder may exist locally with build output only; it is not tracked).
 - TODO: the sign-in code email subject still says "Spike"; confirm the product name for user-facing copy.
-- TODO: no to-do list features, SignalR, or CD yet.
+- TODO: no to-do list features or SignalR yet.

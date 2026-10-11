@@ -35,7 +35,7 @@ Package manager is pnpm; the version is pinned in `package.json` (`packageManage
 
 ### Validation
 
-Run from `apps/web/`: `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm typecheck`, `pnpm build`, `pnpm test` (no tests yet) before considering a change done.
+Run from `apps/web/`: `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm typecheck`, `pnpm build`, `pnpm test` before considering a change done.
 
 ### Open Questions
 

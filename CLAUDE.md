@@ -58,5 +58,4 @@ Run the commands listed in the `CLAUDE.md` of each app you changed (`apps/api/`,
 
 ### Open Questions
 
-- TODO: finish auth, working end-to-end between the deployed SPA and API. The API already has ASP.NET Core Identity with passwordless email-code sign-in, Google sign-in, and JWT access tokens; missing: rotated refresh tokens and the SPA sign-in flow. Remaining work of milestone 0 (Foundation); see the project's idea draft for the full milestone order.
-- TODO: CD (API image publish + deploy, web on Cloudflare Workers) and infrastructure as code (Bicep) were removed on purpose and will be re-added once there is an end-to-end slice worth publishing; they are recoverable from git history.
+- TODO: finish auth, working end-to-end between the SPA and API. The API already has ASP.NET Core Identity with passwordless email-code sign-in, Google sign-in, and JWT access tokens; missing: rotated refresh tokens and the SPA sign-in flow. Remaining work of milestone 0 (Foundation); see the project's idea draft for the full milestone order.
