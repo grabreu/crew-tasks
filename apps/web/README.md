@@ -13,4 +13,4 @@ pnpm dev
 
 The dev server runs at `http://localhost:3000`.
 
-Other commands: `pnpm check` (Biome format + lint), `pnpm typecheck`, `pnpm build`, `pnpm test` (no tests yet).
+Other commands: `pnpm check` (Biome format + lint), `pnpm typecheck`, `pnpm build`, `pnpm test`.
