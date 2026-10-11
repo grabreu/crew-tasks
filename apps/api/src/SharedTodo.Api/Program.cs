@@ -15,6 +15,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer<OpenApiVersioningTransformer>();
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddOperationTransformer<BearerSecuritySchemeTransformer>();
 });
 
 builder.Services.AddMediator(options =>
