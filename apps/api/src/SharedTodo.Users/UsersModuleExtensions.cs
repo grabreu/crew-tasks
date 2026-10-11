@@ -61,6 +61,7 @@ public static class UsersModuleExtensions
     {
         endpoints.MapStartEmailSignInEndpoint();
         endpoints.MapCompleteEmailSignInEndpoint();
+        endpoints.MapGetCurrentUserEndpoint();
         endpoints.MapCompleteOnboardingEndpoint();
 
         return endpoints;
