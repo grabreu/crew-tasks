@@ -5,6 +5,7 @@
   <Folder Name="/Users Module/">
     <Project Path="src/SharedTodo.Users.Contracts/SharedTodo.Users.Contracts.csproj" Id="8aed7bfb-916e-4e39-919b-1490b98c3081" />
     <Project Path="src/SharedTodo.Users/SharedTodo.Users.csproj" Id="ad613ddb-661d-4f61-93a4-9cb3fd5868cb" />
+    <Project Path="tests/SharedTodo.Users.FunctionalTests/SharedTodo.Users.FunctionalTests.csproj" Id="29a2969f-0dfd-42e9-9f03-de2c2abcd787" />
   </Folder>
   <Folder Name="/_Host/">
     <Project Path="src/SharedTodo.Api/SharedTodo.Api.csproj" Id="a3430869-e44a-41c8-b9df-4b674d3a678d" />

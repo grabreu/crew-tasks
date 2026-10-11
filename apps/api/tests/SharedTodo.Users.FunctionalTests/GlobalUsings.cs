@@ -1,0 +1,13 @@
+global using System.Collections.Concurrent;
+global using Mediator;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.Data.SqlClient;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.DependencyInjection.Extensions;
+global using Microsoft.Extensions.Hosting;
+global using Respawn;
+global using Shouldly;
+global using Testcontainers.MsSql;
+global using Xunit;
