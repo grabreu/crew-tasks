@@ -34,5 +34,4 @@ Run from `apps/api/`: `dotnet restore`, `dotnet build --no-restore -c Release`, 
 ### Open Questions
 
 - TODO: rotated refresh tokens (only short-lived access tokens are issued today).
-- TODO: the sign-in code email subject still says "Spike"; confirm the product name for user-facing copy.
 - TODO: no to-do list features or SignalR yet.
