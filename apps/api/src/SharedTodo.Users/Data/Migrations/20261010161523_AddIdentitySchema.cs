@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SharedTodo.Users.Persistence.Migrations;
+namespace SharedTodo.Users.Data.Migrations;
 
 /// <inheritdoc />
 public partial class AddIdentitySchema : Migration

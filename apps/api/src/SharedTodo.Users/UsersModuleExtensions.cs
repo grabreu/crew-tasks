@@ -1,6 +1,7 @@
-using SharedTodo.Users.Common;
+using SharedTodo.Users.Data;
 using SharedTodo.Users.Features;
-using SharedTodo.Users.Persistence;
+using SharedTodo.Users.Identity;
+using SharedTodo.Users.Jwt;
 
 namespace SharedTodo.Users;
 

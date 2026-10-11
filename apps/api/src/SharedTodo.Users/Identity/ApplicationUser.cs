@@ -1,4 +1,4 @@
-namespace SharedTodo.Users.Common;
+namespace SharedTodo.Users.Identity;
 
 public class ApplicationUser : IdentityUser<Guid>
 {

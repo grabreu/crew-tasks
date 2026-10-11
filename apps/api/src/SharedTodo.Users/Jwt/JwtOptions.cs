@@ -1,4 +1,4 @@
-namespace SharedTodo.Users.Common;
+namespace SharedTodo.Users.Jwt;
 
 public class JwtOptions
 {

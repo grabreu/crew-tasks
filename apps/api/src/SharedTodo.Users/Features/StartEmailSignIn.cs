@@ -1,5 +1,5 @@
-using SharedTodo.Users.Common;
 using SharedTodo.Users.Contracts.Events;
+using SharedTodo.Users.Identity;
 
 namespace SharedTodo.Users.Features;
 

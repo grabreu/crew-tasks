@@ -1,4 +1,6 @@
-namespace SharedTodo.Users.Common;
+using SharedTodo.Users.Identity;
+
+namespace SharedTodo.Users.Jwt;
 
 public interface ITokenService
 {

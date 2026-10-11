@@ -1,4 +1,5 @@
-using SharedTodo.Users.Common;
+using SharedTodo.Users.Identity;
+using SharedTodo.Users.Jwt;
 
 namespace SharedTodo.Users.Features;
 
