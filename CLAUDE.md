@@ -4,7 +4,7 @@
 
 Collaborative to-do list for small groups (family, school group, small team): a shared list of items, synced in real time for everyone viewing it. Not a project-management tool, no boards.
 
-Read `README.md` before making changes: it documents the project pitch and business rules. Significant, hard-to-reverse decisions are recorded in `docs/adr/` (created with the first one): check it before revisiting one, and add an entry when making a new one.
+Read `README.md` before making changes: it documents the project pitch and tech stack. Significant, hard-to-reverse decisions are recorded in `docs/adr/` (created with the first one): check it before revisiting one, and add an entry when making a new one.
 
 This is a monorepo. Each app has its own `CLAUDE.md` with its source layout, validation commands, and open questions; read the one for the app you are changing. The rules in this file apply to both.
 
@@ -48,15 +48,15 @@ Future-you revisiting this months later, or someone browsing the portfolio to se
 
 - `apps/api/` - .NET (ASP.NET Core) API, Vertical Slice Architecture. See `apps/api/CLAUDE.md`.
 - `apps/web/` - React SPA, feature-based folders, installable as a minimal PWA. See `apps/web/CLAUDE.md`.
-- `.github/` - one CI workflow per app (`api-ci.yml`, `web-ci.yml`), each path-filtered to its own folder and to its own workflow file, and `dependabot.yml` (actions, NuGet, npm).
+- `.github/` - `dependabot.yml` (actions, NuGet, npm).
 
 Toolchain files (`CLAUDE.md`, `README.md`, tool config, toolchain-specific `.gitignore` patterns) live inside the app folder. The root only holds what spans both apps: `.gitignore` (env and OS files), `.gitattributes`, and `.github/`.
 
 ### Validation
 
-Run the commands listed in the `CLAUDE.md` of each app you changed (`apps/api/`, `apps/web/`) before considering a change done; the matching CI workflow runs the same on push/PR to `main`.
+Run the commands listed in the `CLAUDE.md` of each app you changed (`apps/api/`, `apps/web/`) before considering a change done.
 
 ### Open Questions
 
-- TODO: add ASP.NET Core Identity issuing JWT access + rotated refresh tokens (email/password only, no Google yet), working end-to-end between the deployed SPA and API. Remaining work of milestone 0 (Foundation); see the project's idea draft for the full milestone order.
+- TODO: finish auth, working end-to-end between the deployed SPA and API. The API already has ASP.NET Core Identity with passwordless email-code sign-in, Google sign-in, and JWT access tokens; missing: rotated refresh tokens and the SPA sign-in flow. Remaining work of milestone 0 (Foundation); see the project's idea draft for the full milestone order.
 - TODO: CD (API image publish + deploy, web on Cloudflare Workers) and infrastructure as code (Bicep) were removed on purpose and will be re-added once there is an end-to-end slice worth publishing; they are recoverable from git history.

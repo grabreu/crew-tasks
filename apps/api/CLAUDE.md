@@ -10,21 +10,31 @@
 
 ### Source
 
+Modular monolith: one project per module (plus a `.Contracts` project for what other modules may reference), hosted by `SharedTodo.Api`. Modules talk through events in `*.Contracts`, never by referencing each other's internals.
+
 - `SharedTodo.slnx` - solution.
-- `src/SharedTodo.Api/` - the API project.
-  - `Features/` - one slice per use case (not created yet, no slices).
-  - `Domain/` - entities and business rules; only `SeedWork` (domain event contracts) so far.
-  - `Data/` - `ApplicationDbContext`, EF Core migrations, and `DispatchDomainEventsInterceptor` (publishes domain events after `SaveChanges`).
-  - `Common/` - cross-cutting code: `ValidationBehavior` (FluentValidation in the Mediator pipeline) and `GlobalExceptionHandler`.
+- `src/SharedTodo.Api/` - host: `Program.cs`, `ValidationBehavior` (FluentValidation in the Mediator pipeline), `GlobalExceptionHandler`, OpenAPI transformers (Scalar in Development).
+- `src/SharedTodo.Users/` - Users module (ASP.NET Core Identity, JWT, Google sign-in).
+  - `Features/` - one file per slice: request/command, validator, handler, and endpoint colocated.
+  - `Data/` - `UsersDbContext` (schema `Users`), configurations, EF Core migrations, design-time factory.
+  - `Identity/`, `Jwt/`, `Google/` - `ApplicationUser`, token issuing, Google ID token validation.
+- `src/SharedTodo.Users.Contracts/` - integration events published by Users (`EmailSignInStartedEvent`).
+- `src/SharedTodo.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
+- `src/SharedTodo.AppHost/` - .NET Aspire host for local development: SQL Server container, MailPit, and the API with its configuration.
+- `src/SharedTodo.ServiceDefaults/` - Aspire service defaults (OpenTelemetry, health checks, resilience).
 - `tests/` - test projects (none yet).
 
-Commands and queries go through `Mediator` (source generator); packages are versioned centrally in `Directory.Packages.props`.
+Commands, queries and events go through `Mediator` (source generator), results use `Desfecho`; packages are versioned centrally in `Directory.Packages.props`.
+
+Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints` extension methods that `Program.cs` calls. Options (`Jwt`, `Authentication:Google`, `Email`) are validated on start, so the API does not boot without them.
 
 ### Validation
 
-Run from `apps/api/`: `dotnet restore`, `dotnet build --no-restore -c Release`, `dotnet format --no-restore --verify-no-changes --severity info`, `dotnet test --no-build -c Release` (no test projects yet) before considering a change done; CI (`.github/workflows/api-ci.yml`) runs the same on push/PR to `main`, path-filtered to `apps/api/`.
+Run from `apps/api/`: `dotnet restore`, `dotnet build --no-restore -c Release`, `dotnet format --no-restore --verify-no-changes --severity info`, `dotnet test --no-build -c Release` (no test projects yet) before considering a change done.
 
 ### Open Questions
 
-- TODO: ASP.NET Core Identity with JWT access + rotated refresh tokens (see the root `CLAUDE.md`).
-- TODO: no slices, tests, or CD yet.
+- TODO: rotated refresh tokens (only short-lived access tokens are issued today).
+- TODO: no tests yet (a `tests/` folder may exist locally with build output only; it is not tracked).
+- TODO: the sign-in code email subject still says "Spike"; confirm the product name for user-facing copy.
+- TODO: no to-do list features, SignalR, or CD yet.
