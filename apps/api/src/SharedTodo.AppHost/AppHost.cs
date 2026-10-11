@@ -8,10 +8,12 @@ var usersDb = sql.AddDatabase("usersdb");
 
 var mailpit = builder.AddMailPit("mailpit");
 
+var googleClientId = builder.AddParameter("google-client-id");
 var jwtSecretKey = builder.AddParameter("jwt-secret-key", new GenerateParameterDefault { MinLength = 44, Special = false }, secret: true, persist: true);
 
 builder.AddProject<Projects.SharedTodo_Api>("api")
     .WithReference(usersDb)
+    .WithEnvironment("Authentication__Google__ClientId", googleClientId)
     .WithEnvironment("Jwt__SecretKey", jwtSecretKey)
     .WithEnvironment("Email__Host", mailpit.Resource.PrimaryEndpoint.Property(EndpointProperty.Host))
     .WithEnvironment("Email__Port", mailpit.Resource.PrimaryEndpoint.Property(EndpointProperty.Port))

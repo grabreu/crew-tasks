@@ -1,5 +1,6 @@
 using SharedTodo.Users.Data;
 using SharedTodo.Users.Features;
+using SharedTodo.Users.Google;
 using SharedTodo.Users.Identity;
 using SharedTodo.Users.Jwt;
 
@@ -9,11 +10,7 @@ public static class UsersModuleExtensions
 {
     public static IHostApplicationBuilder AddUsersModuleServices(this IHostApplicationBuilder builder)
     {
-        builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-
         builder.AddSqlServerDbContext<UsersDbContext>("UsersDb");
-
-        builder.Services.AddDataProtection();
 
         builder.Services
             .AddIdentityCore<ApplicationUser>(options =>
@@ -52,7 +49,17 @@ public static class UsersModuleExtensions
 
         builder.Services.AddAuthorization();
 
-        builder.Services.AddScoped<ITokenService, TokenService>();
+        builder.Services.AddSingleton<ITokenService, JwtTokenService>();
+
+        builder.Services
+            .AddOptions<GoogleOptions>()
+            .BindConfiguration(GoogleOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        builder.Services.AddSingleton<IGoogleService, GoogleService>();
+
+        builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         return builder;
     }
@@ -61,6 +68,7 @@ public static class UsersModuleExtensions
     {
         endpoints.MapStartEmailSignInEndpoint();
         endpoints.MapCompleteEmailSignInEndpoint();
+        endpoints.MapSignInWithGoogleEndpoint();
         endpoints.MapGetCurrentUserEndpoint();
         endpoints.MapCompleteOnboardingEndpoint();
 
