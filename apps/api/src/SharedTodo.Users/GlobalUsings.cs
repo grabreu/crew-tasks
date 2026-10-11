@@ -4,6 +4,7 @@ global using System.Security.Claims;
 global using System.Text;
 global using Desfecho;
 global using FluentValidation;
+global using Google.Apis.Auth;
 global using Mediator;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Builder;

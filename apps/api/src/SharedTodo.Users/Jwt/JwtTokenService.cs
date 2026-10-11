@@ -2,7 +2,7 @@ using SharedTodo.Users.Identity;
 
 namespace SharedTodo.Users.Jwt;
 
-public class TokenService(IOptions<JwtOptions> options) : ITokenService
+public class JwtTokenService(IOptions<JwtOptions> options) : ITokenService
 {
     public TokenDto GenerateToken(ApplicationUser user)
     {
