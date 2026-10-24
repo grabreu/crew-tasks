@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { api } from "~/lib/api";
+import { authStore } from "../auth";
 
 export const userQueries = {
   all: () => ["users"] as const,
@@ -15,5 +16,6 @@ export const userQueries = {
             isOnboarded: boolean;
           }>("/users/me")
           .then((response) => response.data),
+      enabled: !!authStore.state.accessToken,
     }),
 };
