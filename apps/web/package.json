@@ -2,7 +2,7 @@
   "name": "web",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@11.22.0",
+  "packageManager": "pnpm@12.11.2",
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
@@ -11,19 +11,23 @@
     "check": "biome check",
     "format": "biome format",
     "lint": "biome lint",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@grabreu/aduana": "^1.0.2",
+    "@tanstack/react-query": "^5.104.2",
     "@tanstack/react-router": "^1.170.41",
+    "@tanstack/react-store": "^0.11.2",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/devtools-vite": "^0.8.5",
     "@tanstack/react-devtools": "^0.10.13",
+    "@tanstack/react-query-devtools": "^5.104.2",
     "@tanstack/react-router-devtools": "^1.167.2",
     "@tanstack/router-cli": "^1.167.40",
     "@tanstack/router-plugin": "^1.168.42",
@@ -33,8 +37,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vite": "^8.3.3",
-    "vitest": "^5.0.3"
+    "vite": "^8.3.3"
   },
   "intent": {
     "skills": [
