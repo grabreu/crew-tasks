@@ -9,154 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
-import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
-import { Route as AuthSignInCompleteRouteImport } from './routes/_auth/sign-in-complete'
-import { Route as AuthSignOutRouteImport } from './routes/_auth/sign-out'
-import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
-import { Route as ProtectedAboutRouteImport } from './routes/_protected/about'
+import { Route as IndexRouteImport } from './routes/index'
 
-const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
-  id: '/_protected',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignInRoute = AuthSignInRouteImport.update({
-  id: '/_auth/sign-in',
-  path: '/sign-in',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignInCompleteRoute = AuthSignInCompleteRouteImport.update({
-  id: '/_auth/sign-in-complete',
-  path: '/sign-in-complete',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignOutRoute = AuthSignOutRouteImport.update({
-  id: '/_auth/sign-out',
-  path: '/sign-out',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
-const ProtectedAboutRoute = ProtectedAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => ProtectedRouteRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof ProtectedIndexRoute
-  '/sign-in': typeof AuthSignInRoute
-  '/sign-in-complete': typeof AuthSignInCompleteRoute
-  '/sign-out': typeof AuthSignOutRoute
-  '/about': typeof ProtectedAboutRoute
+  '/': typeof IndexRoute
 }
 export interface FileRoutesByTo {
-  '/sign-in': typeof AuthSignInRoute
-  '/sign-in-complete': typeof AuthSignInCompleteRoute
-  '/sign-out': typeof AuthSignOutRoute
-  '/about': typeof ProtectedAboutRoute
-  '/': typeof ProtectedIndexRoute
+  '/': typeof IndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_protected': typeof ProtectedRouteRouteWithChildren
-  '/_auth/sign-in': typeof AuthSignInRoute
-  '/_auth/sign-in-complete': typeof AuthSignInCompleteRoute
-  '/_auth/sign-out': typeof AuthSignOutRoute
-  '/_protected/about': typeof ProtectedAboutRoute
-  '/_protected/': typeof ProtectedIndexRoute
+  '/': typeof IndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in' | '/sign-in-complete' | '/sign-out' | '/about'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sign-in' | '/sign-in-complete' | '/sign-out' | '/about' | '/'
-  id:
-    | '__root__'
-    | '/_protected'
-    | '/_auth/sign-in'
-    | '/_auth/sign-in-complete'
-    | '/_auth/sign-out'
-    | '/_protected/about'
-    | '/_protected/'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
-  AuthSignInRoute: typeof AuthSignInRoute
-  AuthSignInCompleteRoute: typeof AuthSignInCompleteRoute
-  AuthSignOutRoute: typeof AuthSignOutRoute
+  IndexRoute: typeof IndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_protected': {
-      id: '/_protected'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof ProtectedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_auth/sign-in': {
-      id: '/_auth/sign-in'
-      path: '/sign-in'
-      fullPath: '/sign-in'
-      preLoaderRoute: typeof AuthSignInRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_auth/sign-in-complete': {
-      id: '/_auth/sign-in-complete'
-      path: '/sign-in-complete'
-      fullPath: '/sign-in-complete'
-      preLoaderRoute: typeof AuthSignInCompleteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_auth/sign-out': {
-      id: '/_auth/sign-out'
-      path: '/sign-out'
-      fullPath: '/sign-out'
-      preLoaderRoute: typeof AuthSignOutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_protected/': {
-      id: '/_protected/'
+    '/': {
+      id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof ProtectedIndexRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
-    '/_protected/about': {
-      id: '/_protected/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof ProtectedAboutRouteImport
-      parentRoute: typeof ProtectedRouteRoute
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface ProtectedRouteRouteChildren {
-  ProtectedAboutRoute: typeof ProtectedAboutRoute
-  ProtectedIndexRoute: typeof ProtectedIndexRoute
-}
-
-const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
-  ProtectedAboutRoute: ProtectedAboutRoute,
-  ProtectedIndexRoute: ProtectedIndexRoute,
-}
-
-const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
-  ProtectedRouteRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
-  ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
-  AuthSignInRoute: AuthSignInRoute,
-  AuthSignInCompleteRoute: AuthSignInCompleteRoute,
-  AuthSignOutRoute: AuthSignOutRoute,
+  IndexRoute: IndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
