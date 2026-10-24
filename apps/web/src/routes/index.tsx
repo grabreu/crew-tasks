@@ -1,6 +1,8 @@
 import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CircleCheckBigIcon } from "lucide-react";
+import { useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -36,7 +38,14 @@ const GoogleIcon = () => {
   );
 };
 
-const RouteComponent = () => {
+const RouteComponent1 = () => {
+  const mutation = useMutation({
+    mutationFn: async (input: { email: string }) => {
+      console.log("sent:", input.email);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    },
+  });
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -49,7 +58,7 @@ const RouteComponent = () => {
       }),
     },
     onSubmit: ({ value }) => {
-      alert(`Enviaríamos um código para ${value.email}`);
+      mutation.mutate({ email: value.email });
     },
   });
 
@@ -95,7 +104,7 @@ const RouteComponent = () => {
                       placeholder="nome@exemplo.com"
                     />
                     <FieldDescription>
-                      Enviaremos um código para o seu e-mail. Sem senha.
+                      Enviaremos um código para o seu e-mail. Sem senha
                     </FieldDescription>
                     <FieldError errors={field.state.meta.errors} />
                   </Field>
@@ -107,11 +116,124 @@ const RouteComponent = () => {
             </Field>
             <FieldSeparator>ou continue com</FieldSeparator>
             <Field>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => alert("Entrar com Google ainda não está ligado")}
-              >
+              <Button variant="outline" type="button">
+                <GoogleIcon />
+                Continuar com Google
+              </Button>
+            </Field>
+            <FieldDescription className="text-center">
+              Ao continuar, você aceita os <Link to="/">Termos de Uso</Link> e a{" "}
+              <Link to="/">Política de Privacidade</Link>.
+            </FieldDescription>
+          </FieldGroup>
+        </form>
+      </main>
+    </div>
+  );
+};
+
+const RouteComponent2 = () => {
+  const mutation = useMutation({
+    mutationFn: async (input: { email: string }) => {
+      console.log("sent:", input.email);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    },
+  });
+
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      code: "",
+    },
+    onSubmit: ({ value }) => {
+      mutation.mutate({ email: value.email });
+    },
+  });
+
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+      <main className="w-full max-w-90">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <FieldGroup>
+            <Field>
+              <CircleCheckBigIcon className="size-10" />
+            </Field>
+            <Field className="text-center">
+              <h1 className="text-balance text-2xl font-bold leading-tight">
+                Tarefas de todo mundo, num só lugar.
+              </h1>
+              <p className="text-balance text-lg font-medium text-muted-foreground">
+                Entre na sua conta
+              </p>
+            </Field>
+            <form.Field name="email">
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>E-mail</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      placeholder="nome@exemplo.com"
+                    />
+                    <FieldDescription>
+                      Enviaremos um código para o seu e-mail. Sem senha
+                    </FieldDescription>
+                    <FieldError errors={field.state.meta.errors} />
+                  </Field>
+                );
+              }}
+            </form.Field>
+            <form.Field name="code">
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Código de verificação
+                    </FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      type="text"
+                    />
+                    <FieldDescription>
+                      Enviamos um código para a sua caixa de entrada
+                    </FieldDescription>
+                    <FieldError errors={field.state.meta.errors} />
+                  </Field>
+                );
+              }}
+            </form.Field>
+            <Field>
+              <Button type="submit">Continuar</Button>
+              <Button type="button" variant="link">
+                Reenviar código de verificação
+              </Button>
+            </Field>
+            <FieldSeparator>ou continue com</FieldSeparator>
+            <Field>
+              <Button variant="outline" type="button">
                 <GoogleIcon />
                 Continuar com Google
               </Button>
@@ -128,5 +250,5 @@ const RouteComponent = () => {
 };
 
 export const Route = createFileRoute("/")({
-  component: RouteComponent,
+  component: RouteComponent2,
 });
