@@ -38,12 +38,23 @@ const GoogleIcon = () => {
   );
 };
 
-const RouteComponent1 = () => {
+type StartEmailSignInFormProps = {
+  sent: boolean;
+  onSent: (email: string) => void;
+  onEdit: () => void;
+};
+
+const StartEmailSignInForm = ({
+  sent,
+  onSent,
+  onEdit,
+}: StartEmailSignInFormProps) => {
   const mutation = useMutation({
     mutationFn: async (input: { email: string }) => {
       console.log("sent:", input.email);
       await new Promise((resolve) => setTimeout(resolve, 1000));
     },
+    onSuccess: (_, input) => onSent(input.email),
   });
 
   const form = useForm({
@@ -63,70 +74,167 @@ const RouteComponent1 = () => {
   });
 
   return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <FieldGroup>
+        <form.Field name="email">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>E-mail</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    onEdit();
+                  }}
+                  aria-invalid={isInvalid}
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  placeholder="nome@exemplo.com"
+                />
+                {!sent && (
+                  <FieldDescription>
+                    Enviaremos um código para o seu e-mail. Sem senha
+                  </FieldDescription>
+                )}
+                <FieldError errors={field.state.meta.errors} />
+              </Field>
+            );
+          }}
+        </form.Field>
+        {!sent && (
+          <Field>
+            <Button type="submit">Continuar</Button>
+          </Field>
+        )}
+      </FieldGroup>
+    </form>
+  );
+};
+
+type CompleteEmailSignInFormProps = {
+  email: string;
+};
+
+const CompleteEmailSignInForm = ({ email }: CompleteEmailSignInFormProps) => {
+  const mutation = useMutation({
+    mutationFn: async (input: { email: string; code: string }) => {
+      console.log("completed:", input.email);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    },
+  });
+
+  const form = useForm({
+    defaultValues: {
+      code: "",
+    },
+    validators: {
+      onSubmit: z.object({
+        code: z.string().regex(/^\d{6}$/, "Código inválido"),
+      }),
+    },
+    onSubmit: ({ value }) => {
+      mutation.mutate({ email, code: value.code });
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <FieldGroup>
+        <form.Field name="code">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Código de verificação
+                </FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                />
+                <FieldDescription>
+                  Enviamos um código para a sua caixa de entrada
+                </FieldDescription>
+                <FieldError errors={field.state.meta.errors} />
+              </Field>
+            );
+          }}
+        </form.Field>
+        <Field>
+          <Button type="submit">Continuar</Button>
+          <Button type="button" variant="link">
+            Reenviar código de verificação
+          </Button>
+        </Field>
+      </FieldGroup>
+    </form>
+  );
+};
+
+const RouteComponent1 = () => {
+  const [sentEmail, setSentEmail] = useState<string | null>(null);
+
+  return (
     <div className="flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <main className="w-full max-w-90">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <Field>
-              <CircleCheckBigIcon className="size-10" />
-            </Field>
-            <Field className="text-center">
-              <h1 className="text-balance text-2xl font-bold leading-tight">
-                Tarefas de todo mundo, num só lugar.
-              </h1>
-              <p className="text-balance text-lg font-medium text-muted-foreground">
-                Entre na sua conta
-              </p>
-            </Field>
-            <form.Field name="email">
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>E-mail</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      type="email"
-                      inputMode="email"
-                      autoComplete="email"
-                      placeholder="nome@exemplo.com"
-                    />
-                    <FieldDescription>
-                      Enviaremos um código para o seu e-mail. Sem senha
-                    </FieldDescription>
-                    <FieldError errors={field.state.meta.errors} />
-                  </Field>
-                );
-              }}
-            </form.Field>
-            <Field>
-              <Button type="submit">Continuar</Button>
-            </Field>
-            <FieldSeparator>ou continue com</FieldSeparator>
-            <Field>
-              <Button variant="outline" type="button">
-                <GoogleIcon />
-                Continuar com Google
-              </Button>
-            </Field>
-            <FieldDescription className="text-center">
-              Ao continuar, você aceita os <Link to="/">Termos de Uso</Link> e a{" "}
-              <Link to="/">Política de Privacidade</Link>.
-            </FieldDescription>
-          </FieldGroup>
-        </form>
+        <FieldGroup>
+          <Field>
+            <CircleCheckBigIcon className="size-10" />
+          </Field>
+          <Field className="text-center">
+            <h1 className="text-balance text-2xl font-bold leading-tight">
+              Tarefas de todo mundo, num só lugar.
+            </h1>
+            <p className="text-balance text-lg font-medium text-muted-foreground">
+              Entre na sua conta
+            </p>
+          </Field>
+          <StartEmailSignInForm
+            sent={sentEmail !== null}
+            onSent={setSentEmail}
+            onEdit={() => setSentEmail(null)}
+          />
+          {sentEmail && <CompleteEmailSignInForm email={sentEmail} />}
+          <FieldSeparator>ou continue com</FieldSeparator>
+          <Field>
+            <Button variant="outline" type="button">
+              <GoogleIcon />
+              Continuar com Google
+            </Button>
+          </Field>
+          <FieldDescription className="text-center">
+            Ao continuar, você aceita os <Link to="/">Termos de Uso</Link> e a{" "}
+            <Link to="/">Política de Privacidade</Link>.
+          </FieldDescription>
+        </FieldGroup>
       </main>
     </div>
   );
@@ -250,5 +358,5 @@ const RouteComponent2 = () => {
 };
 
 export const Route = createFileRoute("/")({
-  component: RouteComponent2,
+  component: RouteComponent1,
 });
