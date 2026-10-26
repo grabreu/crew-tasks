@@ -1,14 +1,10 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { authStore } from "./login";
 
 const HomePage = () => {
-  const navigate = useNavigate();
-
   return (
     <div>
-      <button type="button" onClick={() => navigate({ to: "/logout" })}>
-        Log out
-      </button>
+      <Link to="/logout">Log out</Link>
     </div>
   );
 };

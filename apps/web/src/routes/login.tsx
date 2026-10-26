@@ -42,21 +42,18 @@ export const authStore = createStore<AuthState, AuthActions>(
 );
 
 const loginMutations = {
-  startPasswordlessLogin: () =>
-    mutationOptions({
-      mutationFn: async (input: { email: string }) => console.log(input),
-    }),
-  completePasswordlessLogin: () =>
-    mutationOptions({
-      mutationFn: async (input: { email: string; code: string }) => {
-        console.log(input);
-        return { accessToken: "fake-token" };
-      },
-    }),
+  startPasswordlessLogin: mutationOptions({
+    mutationFn: async (input: { email: string }) => console.log(input),
+  }),
+  completePasswordlessLogin: mutationOptions({
+    mutationFn: async (input: { email: string; code: string }) => {
+      console.log(input);
+      return { accessToken: "fake-token" };
+    },
+  }),
 };
 
 const loginFormSchema = z.object({
-  chooseLoginMethod: z.object(),
   startPasswordlessLogin: z.object({
     email: z.email("Please enter a valid email address for login."),
   }),
@@ -69,70 +66,54 @@ const loginFormSchema = z.object({
 
 const loginFormOpts = formOptions({
   defaultValues: {
-    chooseLoginMethod: {},
     startPasswordlessLogin: { email: "" },
     completePasswordlessLogin: { code: "" },
   },
 });
 
-const ChooseLoginMethodForm = withForm({
-  ...loginFormOpts,
-  props: {
-    onNext: () => {},
-  },
-  render: function Render({ form, onNext }) {
-    return (
-      <form.FormGroup name="chooseLoginMethod" onGroupSubmit={() => onNext()}>
-        {(formGroup) => (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              formGroup.handleSubmit();
-            }}
-          >
-            <FieldSet>
-              <FieldLegend className="mb-6 flex w-full flex-col items-center gap-4 text-center text-xl">
-                <img src="/favicon-dark.svg" alt="Todos" className="size-10" />
-                Log in to Todos
-              </FieldLegend>
-              <FieldGroup>
-                <form.AppForm>
-                  <Field>
-                    <Button type="submit">Continue with email</Button>
-                    <p className="text-center text-sm text-muted-foreground">
-                      You used email to log in last time
-                    </p>
-                    <Button type="button" variant="outline">
-                      Continue with Google
-                    </Button>
-                    <Button type="button" variant="outline">
-                      Continue with SAML SSO
-                    </Button>
-                    <Button type="button" variant="outline">
-                      Log in with passkey
-                    </Button>
-                  </Field>
-                </form.AppForm>
-              </FieldGroup>
-            </FieldSet>
-          </form>
-        )}
-      </form.FormGroup>
-    );
-  },
-});
+type LoginMethodSelectorProps = {
+  onSelectPasswordless: () => void;
+};
 
-const StartPasswordlessLoginForm = withForm({
+const LoginMethodSelector = ({
+  onSelectPasswordless,
+}: LoginMethodSelectorProps) => {
+  return (
+    <FieldSet>
+      <FieldLegend className="mb-6 flex w-full flex-col items-center gap-4 text-center text-xl">
+        <img src="/favicon-dark.svg" alt="Todos" className="size-10" />
+        Log in to Todos
+      </FieldLegend>
+      <FieldGroup>
+        <Field>
+          <Button type="button" onClick={onSelectPasswordless}>
+            Continue with email
+          </Button>
+          <Button type="button" variant="outline">
+            Continue with Google
+          </Button>
+          <Button type="button" variant="outline">
+            Continue with SAML SSO
+          </Button>
+          <Button type="button" variant="outline">
+            Log in with passkey
+          </Button>
+        </Field>
+      </FieldGroup>
+    </FieldSet>
+  );
+};
+
+const PasswordlessEmailForm = withForm({
   ...loginFormOpts,
   props: {
-    onNext: () => {},
-    onBack: () => {},
+    onEmailSubmitted: () => {},
+    onExit: () => {},
   },
-  render: function Render({ form, onNext, onBack }) {
+  render: function Render({ form, onEmailSubmitted, onExit }) {
     const mutation = useMutation({
-      ...loginMutations.startPasswordlessLogin(),
-      onSuccess: () => onNext(),
+      ...loginMutations.startPasswordlessLogin,
+      onSuccess: () => onEmailSubmitted(),
     });
 
     return (
@@ -183,7 +164,7 @@ const StartPasswordlessLoginForm = withForm({
                 <form.AppForm>
                   <Field>
                     <Button type="submit">Continue with email</Button>
-                    <Button type="button" variant="ghost" onClick={onBack}>
+                    <Button type="button" variant="ghost" onClick={onExit}>
                       Back to login
                     </Button>
                   </Field>
@@ -197,16 +178,16 @@ const StartPasswordlessLoginForm = withForm({
   },
 });
 
-const CompletePasswordlessLoginForm = withForm({
+const PasswordlessVerificationForm = withForm({
   ...loginFormOpts,
   props: {
-    onBack: () => {},
+    onExit: () => {},
   },
-  render: function Render({ form, onBack }) {
+  render: function Render({ form, onExit }) {
     const navigate = useNavigate();
 
     const mutation = useMutation({
-      ...loginMutations.completePasswordlessLogin(),
+      ...loginMutations.completePasswordlessLogin,
       onSuccess: (data) => {
         authStore.actions.set(data.accessToken);
         navigate({ to: "/" });
@@ -279,7 +260,7 @@ const CompletePasswordlessLoginForm = withForm({
                 <form.AppForm>
                   <Field>
                     <Button type="submit">Continue with login code</Button>
-                    <Button type="button" variant="ghost" onClick={onBack}>
+                    <Button type="button" variant="ghost" onClick={onExit}>
                       Back to login
                     </Button>
                   </Field>
@@ -293,7 +274,11 @@ const CompletePasswordlessLoginForm = withForm({
   },
 });
 
-const LoginPage = () => {
+type PasswordlessLoginFlowProps = {
+  onExit: () => void;
+};
+
+const PasswordlessLoginFlow = ({ onExit }: PasswordlessLoginFlowProps) => {
   const [step, setStep] = useState(0);
 
   const form = useAppForm({
@@ -304,28 +289,37 @@ const LoginPage = () => {
     },
   });
 
-  const handleNext = () => setStep((s) => s + 1);
+  return (
+    <>
+      {step === 0 && (
+        <PasswordlessEmailForm
+          form={form}
+          onEmailSubmitted={() => setStep((s) => s + 1)}
+          onExit={onExit}
+        />
+      )}
+      {step === 1 && (
+        <PasswordlessVerificationForm form={form} onExit={onExit} />
+      )}
+    </>
+  );
+};
 
-  const handleBack = () => {
-    form.reset();
-    setStep(0);
-  };
+type LoginMethod = "passwordless" | null;
+
+const LoginPage = () => {
+  const [method, setMethod] = useState<LoginMethod>(null);
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <main className="w-full max-w-90">
-        {step === 0 && (
-          <ChooseLoginMethodForm form={form} onNext={handleNext} />
-        )}
-        {step === 1 && (
-          <StartPasswordlessLoginForm
-            form={form}
-            onNext={handleNext}
-            onBack={handleBack}
+        {method === null && (
+          <LoginMethodSelector
+            onSelectPasswordless={() => setMethod("passwordless")}
           />
         )}
-        {step === 2 && (
-          <CompletePasswordlessLoginForm form={form} onBack={handleBack} />
+        {method === "passwordless" && (
+          <PasswordlessLoginFlow onExit={() => setMethod(null)} />
         )}
       </main>
     </div>
