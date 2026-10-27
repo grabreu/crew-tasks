@@ -4,22 +4,22 @@ using SharedTodo.Users.Jwt;
 
 namespace SharedTodo.Users.Features;
 
-public record SignInWithGoogleCommand(string IdToken) : ICommand<Result<TokenDto>>;
+public record LoginWithGoogleCommand(string IdToken) : ICommand<Result<TokenDto>>;
 
-public class SignInWithGoogleValidator : AbstractValidator<SignInWithGoogleCommand>
+public class LoginWithGoogleValidator : AbstractValidator<LoginWithGoogleCommand>
 {
-    public SignInWithGoogleValidator()
+    public LoginWithGoogleValidator()
     {
         RuleFor(x => x.IdToken)
             .NotEmpty();
     }
 }
 
-public class SignInWithGoogleHandler(UserManager<ApplicationUser> userManager, ITokenService tokenService, IGoogleService googleService) : ICommandHandler<SignInWithGoogleCommand, Result<TokenDto>>
+public class LoginWithGoogleHandler(UserManager<ApplicationUser> userManager, ITokenService tokenService, IGoogleService googleService) : ICommandHandler<LoginWithGoogleCommand, Result<TokenDto>>
 {
     private const string LoginProvider = "Google";
 
-    public async ValueTask<Result<TokenDto>> Handle(SignInWithGoogleCommand command, CancellationToken cancellationToken)
+    public async ValueTask<Result<TokenDto>> Handle(LoginWithGoogleCommand command, CancellationToken cancellationToken)
     {
         var googleIdentity = await googleService.ValidateIdTokenAsync(command.IdToken, cancellationToken);
 
@@ -66,26 +66,26 @@ public class SignInWithGoogleHandler(UserManager<ApplicationUser> userManager, I
     }
 }
 
-public record SignInWithGoogleRequest(string IdToken);
+public record LoginWithGoogleRequest(string IdToken);
 
-public static class SignInWithGoogleEndpoint
+public static class LoginWithGoogleEndpoint
 {
-    public static RouteHandlerBuilder MapSignInWithGoogleEndpoint(this IEndpointRouteBuilder endpoints)
+    public static RouteHandlerBuilder MapLoginWithGoogleEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapPost("/auth/google/sign-in", HandleAsync)
+            .MapPost("/auth/login/google", HandleAsync)
             .AllowAnonymous()
             .WithTags("Authentication")
-            .WithName("SignInWithGoogle")
-            .WithSummary("Sign In with Google")
+            .WithName("LoginWithGoogle")
+            .WithSummary("Login with Google")
             .WithDescription("Authenticates a user using a Google ID token.")
             .Produces<TokenDto>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status401Unauthorized);
     }
 
-    private static ValueTask<IResult> HandleAsync(SignInWithGoogleRequest request, ISender sender, CancellationToken cancellationToken)
+    private static ValueTask<IResult> HandleAsync(LoginWithGoogleRequest request, ISender sender, CancellationToken cancellationToken)
     {
-        return sender.Send(new SignInWithGoogleCommand(request.IdToken), cancellationToken).ToOk();
+        return sender.Send(new LoginWithGoogleCommand(request.IdToken), cancellationToken).ToOk();
     }
 }

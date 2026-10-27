@@ -11,7 +11,7 @@ dotnet restore
 dotnet run --project src/SharedTodo.AppHost
 ```
 
-The AppHost starts SQL Server (persistent, with a data volume), MailPit (catches the sign-in code emails), and the API, and opens the Aspire dashboard. It prompts for the `google-client-id` parameter; `jwt-secret-key` is generated and persisted. In Development the API applies EF Core migrations on startup and serves the API reference (Scalar) at `/scalar`; find its URL in the dashboard.
+The AppHost starts SQL Server (persistent, with a data volume), MailPit (catches the login code emails), and the API, and opens the Aspire dashboard. It prompts for the `google-client-id` parameter; `jwt-secret-key` is generated and persisted. In Development the API applies EF Core migrations on startup and serves the API reference (Scalar) at `/scalar`; find its URL in the dashboard.
 
 Running `SharedTodo.Api` alone also works if you provide the `UsersDb` connection string, `Jwt:SecretKey`, `Authentication:Google:ClientId`, and `Email:Host` (configuration is validated on start).
 
@@ -19,9 +19,9 @@ Running `SharedTodo.Api` alone also works if you provide the `UsersDb` connectio
 
 | Method | Route | Auth | Purpose |
 | --- | --- | --- | --- |
-| POST | `/auth/email/sign-in` | anonymous | Sends a 6-digit sign-in code by email (creates the user if new). |
-| POST | `/auth/email/sign-in/complete` | anonymous | Exchanges email + code for an access token. |
-| POST | `/auth/google/sign-in` | anonymous | Exchanges a Google ID token for an access token. |
+| POST | `/auth/login/passwordless` | anonymous | Sends a 6-digit login code by email (creates the user if new). |
+| POST | `/auth/login/passwordless/complete` | anonymous | Exchanges email + code for an access token. |
+| POST | `/auth/login/google` | anonymous | Exchanges a Google ID token for an access token. |
 | GET | `/users/me` | bearer | Current user. |
 | POST | `/users/me/onboarding` | bearer | Sets the display name once. |
 

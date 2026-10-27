@@ -10,53 +10,60 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as LogoutRouteImport } from './routes/logout'
+import { Route as LoginRouteRouteImport } from './routes/login/route'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as LoginPasswordlessRouteImport } from './routes/login/passwordless'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
+const LoginRouteRoute = LoginRouteRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LogoutRoute = LogoutRouteImport.update({
-  id: '/logout',
-  path: '/logout',
-  getParentRoute: () => rootRouteImport,
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LoginRouteRoute,
+} as any)
+const LoginPasswordlessRoute = LoginPasswordlessRouteImport.update({
+  id: '/passwordless',
+  path: '/passwordless',
+  getParentRoute: () => LoginRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/logout': typeof LogoutRoute
+  '/login': typeof LoginRouteRouteWithChildren
+  '/login/passwordless': typeof LoginPasswordlessRoute
+  '/login/': typeof LoginIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/logout': typeof LogoutRoute
+  '/login/passwordless': typeof LoginPasswordlessRoute
+  '/login': typeof LoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/logout': typeof LogoutRoute
+  '/login': typeof LoginRouteRouteWithChildren
+  '/login/passwordless': typeof LoginPasswordlessRoute
+  '/login/': typeof LoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/logout'
+  fullPaths: '/' | '/login' | '/login/passwordless' | '/login/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/logout'
-  id: '__root__' | '/' | '/login' | '/logout'
+  to: '/' | '/login/passwordless' | '/login'
+  id: '__root__' | '/' | '/login' | '/login/passwordless' | '/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LoginRoute: typeof LoginRoute
-  LogoutRoute: typeof LogoutRoute
+  LoginRouteRoute: typeof LoginRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -72,23 +79,43 @@ declare module '@tanstack/react-router' {
       id: '/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+      preLoaderRoute: typeof LoginRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/logout': {
-      id: '/logout'
-      path: '/logout'
-      fullPath: '/logout'
-      preLoaderRoute: typeof LogoutRouteImport
-      parentRoute: typeof rootRouteImport
+    '/login/': {
+      id: '/login/'
+      path: '/'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof LoginRouteRoute
+    }
+    '/login/passwordless': {
+      id: '/login/passwordless'
+      path: '/passwordless'
+      fullPath: '/login/passwordless'
+      preLoaderRoute: typeof LoginPasswordlessRouteImport
+      parentRoute: typeof LoginRouteRoute
     }
   }
 }
 
+interface LoginRouteRouteChildren {
+  LoginPasswordlessRoute: typeof LoginPasswordlessRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+}
+
+const LoginRouteRouteChildren: LoginRouteRouteChildren = {
+  LoginPasswordlessRoute: LoginPasswordlessRoute,
+  LoginIndexRoute: LoginIndexRoute,
+}
+
+const LoginRouteRouteWithChildren = LoginRouteRoute._addFileChildren(
+  LoginRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LoginRoute: LoginRoute,
-  LogoutRoute: LogoutRoute,
+  LoginRouteRoute: LoginRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

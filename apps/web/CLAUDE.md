@@ -27,9 +27,9 @@ Enabled skill scope is `@tanstack/*` only (see `intent.skills` in `package.json`
 - `src/styles.css` - Tailwind CSS entry.
 - `vite.config.ts` - Vite configuration (React, Tailwind, router and devtools plugins).
 - `vitest.config.ts` - standalone, does not extend `vite.config.ts`: it only sets the `tsconfig` path alias and the React plugin, so dev plugins do not run in tests. Add to it whatever a test needs.
-- `biome.json` - formatter and linter (Biome). Biome reads only this folder's `.gitignore` (its VCS root is `apps/web/`), so keep `web` toolchain patterns there; env and OS patterns live in the root `.gitignore`.
+- `biome.json` - formatter and linter (Biome); it skips `src/components/ui` (shadcn-generated). Biome reads only this folder's `.gitignore` (its VCS root is `apps/web/`), so keep `web` toolchain patterns there; env and OS patterns live in the root `.gitignore`.
 
-Feature code (components, hooks, API calls) goes in feature folders under `src/`; none exist yet.
+Feature code (components, hooks, API calls) goes in feature folders under `src/features/` (`auth`, `users`); their API calls are mocked until the SPA is wired to the API.
 
 Package manager is pnpm; the version is pinned in `package.json` (`packageManager`).
 

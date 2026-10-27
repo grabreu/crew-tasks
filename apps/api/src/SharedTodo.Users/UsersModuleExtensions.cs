@@ -66,9 +66,9 @@ public static class UsersModuleExtensions
 
     public static IEndpointRouteBuilder MapUsersModuleEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapStartEmailSignInEndpoint();
-        endpoints.MapCompleteEmailSignInEndpoint();
-        endpoints.MapSignInWithGoogleEndpoint();
+        endpoints.MapStartPasswordlessLoginEndpoint();
+        endpoints.MapCompletePasswordlessLoginEndpoint();
+        endpoints.MapLoginWithGoogleEndpoint();
         endpoints.MapGetCurrentUserEndpoint();
         endpoints.MapCompleteOnboardingEndpoint();
 

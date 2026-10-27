@@ -14,11 +14,11 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
 
 - `SharedTodo.slnx` - solution.
 - `src/SharedTodo.Api/` - host: `Program.cs`, `ValidationBehavior` (FluentValidation in the Mediator pipeline), `GlobalExceptionHandler`, OpenAPI transformers (Scalar in Development).
-- `src/SharedTodo.Users/` - Users module (ASP.NET Core Identity, JWT, Google sign-in).
+- `src/SharedTodo.Users/` - Users module (ASP.NET Core Identity, JWT, Google login).
   - `Features/` - one file per slice: request/command, validator, handler, and endpoint colocated.
   - `Data/` - `UsersDbContext` (schema `Users`), configurations, EF Core migrations, design-time factory.
   - `Identity/`, `Jwt/`, `Google/` - `ApplicationUser`, token issuing, Google ID token validation.
-- `src/SharedTodo.Users.Contracts/` - integration events published by Users (`EmailSignInStartedEvent`).
+- `src/SharedTodo.Users.Contracts/` - integration events published by Users (`PasswordlessLoginStartedEvent`).
 - `src/SharedTodo.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
 - `src/SharedTodo.AppHost/` - .NET Aspire host for local development: SQL Server container, MailPit, and the API with its configuration.
 - `src/SharedTodo.ServiceDefaults/` - Aspire service defaults (OpenTelemetry, health checks, resilience).
