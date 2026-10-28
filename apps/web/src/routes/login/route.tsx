@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { authStore } from "~/features/auth/store";
+import { authStore } from "~/features/auth/store/auth-store";
 
 const LoginLayout = () => {
   return (

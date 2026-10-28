@@ -5,7 +5,7 @@ type AuthState = {
 };
 
 type AuthActions = {
-  set: (accessToken: string) => void;
+  setAccessToken: (accessToken: string) => void;
   clear: () => void;
 };
 
@@ -16,7 +16,7 @@ const initialState: AuthState = {
 export const authStore = createStore<AuthState, AuthActions>(
   initialState,
   ({ setState }) => ({
-    set: (accessToken: string) =>
+    setAccessToken: (accessToken: string) =>
       setState(() => ({
         accessToken,
       })),

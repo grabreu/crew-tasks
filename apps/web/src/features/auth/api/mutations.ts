@@ -5,7 +5,7 @@ export const authMutations = {
     mutationOptions({
       mutationKey: ["auth", "login", "passwordless", "start"],
       mutationFn: async (input: { email: string }) => {
-        console.log(input);
+        // TODO: mock failure trigger, remove with the real API call
         if (input.email === "error@shared-todo.dev") {
           throw new Error();
         }
@@ -16,7 +16,7 @@ export const authMutations = {
     mutationOptions({
       mutationKey: ["auth", "login", "passwordless", "complete"],
       mutationFn: async (input: { email: string; code: string }) => {
-        console.log(input);
+        // TODO: mock failure trigger, remove with the real API call
         if (input.code === "000000") {
           throw new Error();
         }

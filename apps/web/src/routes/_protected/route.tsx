@@ -1,6 +1,6 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { authStore } from "~/features/auth/store";
-import { userQueries } from "~/features/users/queries";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { authStore } from "~/features/auth/store/auth-store";
+import { userQueries } from "~/features/users/api/queries";
 
 export const Route = createFileRoute("/_protected")({
   beforeLoad: () => {
@@ -13,5 +13,4 @@ export const Route = createFileRoute("/_protected")({
   loader: ({ context }) => {
     return context.queryClient.query(userQueries.getCurrentUser());
   },
-  component: Outlet,
 });

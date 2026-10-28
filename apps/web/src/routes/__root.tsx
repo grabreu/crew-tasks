@@ -2,7 +2,11 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  Navigate,
+  Outlet,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 const RootLayout = () => {
@@ -19,7 +23,7 @@ const RootLayout = () => {
             render: <TanStackRouterDevtoolsPanel />,
           },
           {
-            name: "Tanstack Query",
+            name: "TanStack Query",
             render: <ReactQueryDevtoolsPanel />,
           },
           {
@@ -38,4 +42,5 @@ type RouteContext = {
 
 export const Route = createRootRouteWithContext<RouteContext>()({
   component: RootLayout,
+  notFoundComponent: () => <Navigate to="/" replace />,
 });

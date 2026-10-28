@@ -1,23 +1,16 @@
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
-import { authStore } from "~/features/auth/store";
-import { userQueries } from "~/features/users/queries";
+import { useLogout } from "~/features/auth/hooks/use-logout";
+import { userQueries } from "~/features/users/api/queries";
 
 const HomePage = () => {
-  const currentUserQuery = useSuspenseQuery(userQueries.getCurrentUser());
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-
-  const logout = () => {
-    queryClient.clear();
-    authStore.actions.clear();
-    navigate({ to: "/login" });
-  };
+  const { data: currentUser } = useSuspenseQuery(userQueries.getCurrentUser());
+  const logout = useLogout();
 
   return (
     <div>
-      <h1>Welcome, {currentUserQuery.data.email}!</h1>
+      <h1>Welcome, {currentUser.email}!</h1>
       <Button type="button" variant="ghost" onClick={logout}>
         Log out
       </Button>
