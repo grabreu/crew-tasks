@@ -1,7 +1,8 @@
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
-import { userQueries } from "~/features/users/api/queries";
+import { authStore } from "~/features/auth/store";
+import { userQueries } from "~/features/users/queries";
 
 const HomePage = () => {
   const currentUserQuery = useSuspenseQuery(userQueries.getCurrentUser());
@@ -10,6 +11,7 @@ const HomePage = () => {
 
   const logout = () => {
     queryClient.clear();
+    authStore.actions.clear();
     navigate({ to: "/login" });
   };
 
@@ -23,9 +25,6 @@ const HomePage = () => {
   );
 };
 
-export const Route = createFileRoute("/")({
-  loader: ({ context }) => {
-    return context.queryClient.query(userQueries.getCurrentUser());
-  },
+export const Route = createFileRoute("/_protected/")({
   component: HomePage,
 });

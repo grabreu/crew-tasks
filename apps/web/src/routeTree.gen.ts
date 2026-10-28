@@ -9,20 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as LoginRouteRouteImport } from './routes/login/route'
+import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LoginPasswordlessRouteImport } from './routes/login/passwordless'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
+  id: '/_protected',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRouteRoute = LoginRouteRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProtectedRouteRoute,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
   id: '/',
@@ -36,43 +41,50 @@ const LoginPasswordlessRoute = LoginPasswordlessRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof ProtectedIndexRoute
   '/login': typeof LoginRouteRouteWithChildren
   '/login/passwordless': typeof LoginPasswordlessRoute
   '/login/': typeof LoginIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/login/passwordless': typeof LoginPasswordlessRoute
+  '/': typeof ProtectedIndexRoute
   '/login': typeof LoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_protected': typeof ProtectedRouteRouteWithChildren
   '/login': typeof LoginRouteRouteWithChildren
   '/login/passwordless': typeof LoginPasswordlessRoute
+  '/_protected/': typeof ProtectedIndexRoute
   '/login/': typeof LoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/login' | '/login/passwordless' | '/login/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login/passwordless' | '/login'
-  id: '__root__' | '/' | '/login' | '/login/passwordless' | '/login/'
+  to: '/login/passwordless' | '/' | '/login'
+  id:
+    | '__root__'
+    | '/_protected'
+    | '/login'
+    | '/login/passwordless'
+    | '/_protected/'
+    | '/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   LoginRouteRoute: typeof LoginRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_protected': {
+      id: '/_protected'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof ProtectedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -81,6 +93,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_protected/': {
+      id: '/_protected/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof ProtectedIndexRouteImport
+      parentRoute: typeof ProtectedRouteRoute
     }
     '/login/': {
       id: '/login/'
@@ -99,6 +118,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ProtectedRouteRouteChildren {
+  ProtectedIndexRoute: typeof ProtectedIndexRoute
+}
+
+const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
+  ProtectedIndexRoute: ProtectedIndexRoute,
+}
+
+const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
+  ProtectedRouteRouteChildren,
+)
+
 interface LoginRouteRouteChildren {
   LoginPasswordlessRoute: typeof LoginPasswordlessRoute
   LoginIndexRoute: typeof LoginIndexRoute
@@ -114,7 +145,7 @@ const LoginRouteRouteWithChildren = LoginRouteRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   LoginRouteRoute: LoginRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport

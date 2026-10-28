@@ -1,4 +1,5 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { authStore } from "~/features/auth/store";
 
 const LoginLayout = () => {
   return (
@@ -11,5 +12,10 @@ const LoginLayout = () => {
 };
 
 export const Route = createFileRoute("/login")({
+  beforeLoad: () => {
+    if (authStore.state.accessToken) {
+      throw redirect({ to: "/" });
+    }
+  },
   component: LoginLayout,
 });

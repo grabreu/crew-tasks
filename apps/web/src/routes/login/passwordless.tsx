@@ -14,7 +14,8 @@ import {
   FieldSet,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { authMutations } from "~/features/auth/api/mutations";
+import { authMutations } from "~/features/auth/mutations";
+import { authStore } from "~/features/auth/store";
 import { useAppForm, withForm } from "~/lib/form";
 
 const passwordlessFormSchema = z.object({
@@ -132,7 +133,8 @@ const PasswordlessVerificationForm = withForm({
 
     const mutation = useMutation({
       ...authMutations.completePasswordlessLogin(),
-      onSuccess: () => {
+      onSuccess: (data) => {
+        authStore.actions.set(data.accessToken);
         navigate({ to: "/" });
       },
     });

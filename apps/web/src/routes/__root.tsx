@@ -1,4 +1,5 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
@@ -20,6 +21,10 @@ const RootLayout = () => {
           {
             name: "Tanstack Query",
             render: <ReactQueryDevtoolsPanel />,
+          },
+          {
+            name: "TanStack Form",
+            render: <FormDevtoolsPanel />,
           },
         ]}
       />
