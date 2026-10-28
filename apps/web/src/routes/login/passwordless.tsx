@@ -14,7 +14,6 @@ import {
   FieldSet,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { Spinner } from "~/components/ui/spinner";
 import { authMutations } from "~/features/auth/api/mutations";
 import { useAppForm, withForm } from "~/lib/form";
 
@@ -80,7 +79,10 @@ const PasswordlessEmailForm = withForm({
                           name={field.name}
                           value={field.state.value}
                           onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
+                          onChange={(e) => {
+                            mutation.reset();
+                            field.handleChange(e.target.value);
+                          }}
                           aria-invalid={isInvalid}
                           type="email"
                           inputMode="email"
@@ -88,6 +90,14 @@ const PasswordlessEmailForm = withForm({
                           placeholder="Enter your email address..."
                         />
                         <FieldError errors={field.state.meta.errors} />
+                        {mutation.isError && (
+                          <div
+                            role="alert"
+                            className="text-sm font-normal text-destructive"
+                          >
+                            Invalid email address. Please try again.
+                          </div>
+                        )}
                       </Field>
                     );
                   }}
@@ -95,9 +105,6 @@ const PasswordlessEmailForm = withForm({
                 <form.AppForm>
                   <Field>
                     <Button type="submit" disabled={mutation.isPending}>
-                      {mutation.isPending && (
-                        <Spinner data-icon="inline-start" />
-                      )}
                       Continue with email
                     </Button>
                     <Button
@@ -177,7 +184,10 @@ const PasswordlessVerificationForm = withForm({
                           name={field.name}
                           value={field.state.value}
                           onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
+                          onChange={(e) => {
+                            mutation.reset();
+                            field.handleChange(e.target.value);
+                          }}
                           aria-invalid={isInvalid}
                           type="text"
                           inputMode="numeric"
@@ -187,6 +197,14 @@ const PasswordlessVerificationForm = withForm({
                           className="text-center font-mono"
                         />
                         <FieldError errors={field.state.meta.errors} />
+                        {mutation.isError && (
+                          <div
+                            role="alert"
+                            className="text-sm font-normal text-destructive"
+                          >
+                            Invalid verification code. Please try again.
+                          </div>
+                        )}
                       </Field>
                     );
                   }}
@@ -194,9 +212,6 @@ const PasswordlessVerificationForm = withForm({
                 <form.AppForm>
                   <Field>
                     <Button type="submit" disabled={mutation.isPending}>
-                      {mutation.isPending && (
-                        <Spinner data-icon="inline-start" />
-                      )}
                       Continue with login code
                     </Button>
                     <Button
