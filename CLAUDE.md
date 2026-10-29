@@ -1,12 +1,10 @@
-# shared-todo
+# crew-tasks
 
 ## Repository
 
-Collaborative to-do list for small groups (family, school group, small team): a shared list of items, synced in real time for everyone viewing it. Not a project-management tool, no boards.
+Backend for collaborative to-do lists shared by small groups (family, school group, small team), synced in real time for everyone viewing a list. Not a project-management tool, no boards. Backend only by design: no web frontend, the API reference (Scalar) is the interface.
 
-Read `README.md` before making changes: it documents the project pitch and tech stack. Significant, hard-to-reverse decisions are recorded in `docs/adr/` (created with the first one): check it before revisiting one, and add an entry when making a new one.
-
-This is a monorepo. Each app has its own `CLAUDE.md` with its source layout, validation commands, and open questions; read the one for the app you are changing. The rules in this file apply to both.
+Read `README.md` before making changes: it documents the project pitch, tech stack, and how to run it. Significant, hard-to-reverse decisions are recorded in `docs/adr/` (created with the first one): check it before revisiting one, and add an entry when making a new one.
 
 ## General Rules
 
@@ -46,16 +44,34 @@ Future-you revisiting this months later, or someone browsing the portfolio to se
 
 ### Source
 
-- `apps/api/` - .NET (ASP.NET Core) API, Vertical Slice Architecture. See `apps/api/CLAUDE.md`.
-- `apps/web/` - React SPA, feature-based folders, installable as a minimal PWA. See `apps/web/CLAUDE.md`.
-- `.github/` - `dependabot.yml` (actions, NuGet, npm).
+.NET (ASP.NET Core) API, Vertical Slice Architecture: one slice per use case, with command/query + handler + endpoint colocated.
 
-Toolchain files (`CLAUDE.md`, `README.md`, tool config, toolchain-specific `.gitignore` patterns) live inside the app folder. The root only holds what spans both apps: `.gitignore` (env and OS files), `.gitattributes`, and `.github/`.
+Modular monolith: one project per module (plus a `.Contracts` project for what other modules may reference), hosted by `CrewTasks.Api`. Modules talk through events in `*.Contracts`, never by referencing each other's internals.
+
+- `CrewTasks.slnx` - solution.
+- `src/CrewTasks.Api/` - host: `Program.cs`, `ValidationBehavior` (FluentValidation in the Mediator pipeline), `GlobalExceptionHandler`, OpenAPI transformers (Scalar in Development).
+- `src/CrewTasks.Users/` - Users module (ASP.NET Core Identity, JWT, Google sign-in).
+  - `Features/` - one file per slice: request/command, validator, handler, and endpoint colocated.
+  - `Data/` - `UsersDbContext` (schema `Users`), configurations, EF Core migrations, design-time factory.
+  - `Identity/`, `Jwt/`, `Google/` - `ApplicationUser`, token issuing, Google ID token validation.
+- `src/CrewTasks.Users.Contracts/` - integration events published by Users (`EmailSignInStartedEvent`).
+- `src/CrewTasks.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
+- `src/CrewTasks.AppHost/` - .NET Aspire host for local development: SQL Server container, MailPit, and the API with its configuration.
+- `src/CrewTasks.ServiceDefaults/` - Aspire service defaults (OpenTelemetry, health checks, resilience).
+- `.github/` - `dependabot.yml` (actions, NuGet).
+
+Commands, queries and events go through `Mediator` (source generator), results use `Desfecho`; packages are versioned centrally in `Directory.Packages.props`.
+
+Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints` extension methods that `Program.cs` calls. Options (`Jwt`, `Authentication:Google`, `Email`) are validated on start, so the API does not boot without them.
 
 ### Validation
 
-Run the commands listed in the `CLAUDE.md` of each app you changed (`apps/api/`, `apps/web/`) before considering a change done.
+Run from the repo root: `dotnet restore`, `dotnet build --no-restore -c Release`, `dotnet format --no-restore --verify-no-changes --severity info` before considering a change done.
 
 ### Open Questions
 
-- TODO: finish auth, working end-to-end between the SPA and API. The API already has ASP.NET Core Identity with passwordless email-code sign-in, Google sign-in, and JWT access tokens; missing: rotated refresh tokens and the SPA sign-in flow. Remaining work of milestone 0 (Foundation); see the project's idea draft for the full milestone order.
+- TODO: remove Google sign-in (decided, to be done in a separate step after the backend-only refactor): endpoint, `Google/` folder, options, and the `google-client-id` AppHost parameter. Email-code sign-in stays as the only login.
+- TODO: scope is meant to stay lean: lists, items, members, and share-link invites; no comments, attachments, reminders, or labels. Confirm before building.
+- TODO: terminal client to demonstrate real-time sync (not started; tech to define).
+- TODO: finish auth: rotated refresh tokens (only short-lived access tokens are issued today). Remaining work of milestone 0 (Foundation); see the project's idea draft for the milestone order.
+- TODO: no to-do list features or SignalR yet.
