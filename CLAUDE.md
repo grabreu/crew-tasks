@@ -50,10 +50,10 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
 
 - `CrewTasks.slnx` - solution.
 - `src/CrewTasks.Api/` - host: `Program.cs`, `ValidationBehavior` (FluentValidation in the Mediator pipeline), `GlobalExceptionHandler`, OpenAPI transformers (Scalar in Development).
-- `src/CrewTasks.Users/` - Users module (ASP.NET Core Identity, JWT, Google sign-in).
+- `src/CrewTasks.Users/` - Users module (ASP.NET Core Identity, JWT, email-code sign-in).
   - `Features/` - one file per slice: request/command, validator, handler, and endpoint colocated.
   - `Data/` - `UsersDbContext` (schema `Users`), configurations, EF Core migrations, design-time factory.
-  - `Identity/`, `Jwt/`, `Google/` - `ApplicationUser`, token issuing, Google ID token validation.
+  - `Identity/`, `Jwt/` - `ApplicationUser`, token issuing.
 - `src/CrewTasks.Users.Contracts/` - integration events published by Users (`EmailSignInStartedEvent`).
 - `src/CrewTasks.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
 - `src/CrewTasks.AppHost/` - .NET Aspire host for local development: SQL Server container, MailPit, and the API with its configuration.
@@ -62,7 +62,7 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
 
 Commands, queries and events go through `Mediator` (source generator), results use `Desfecho`; packages are versioned centrally in `Directory.Packages.props`.
 
-Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints` extension methods that `Program.cs` calls. Options (`Jwt`, `Authentication:Google`, `Email`) are validated on start, so the API does not boot without them.
+Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints` extension methods that `Program.cs` calls. Options (`Jwt`, `Email`) are validated on start, so the API does not boot without them.
 
 ### Validation
 
@@ -70,7 +70,6 @@ Run from the repo root: `dotnet restore`, `dotnet build --no-restore -c Release`
 
 ### Open Questions
 
-- TODO: remove Google sign-in (decided, to be done in a separate step after the backend-only refactor): endpoint, `Google/` folder, options, and the `google-client-id` AppHost parameter. Email-code sign-in stays as the only login.
 - TODO: scope is meant to stay lean: lists, items, members, and share-link invites; no comments, attachments, reminders, or labels. Confirm before building.
 - TODO: terminal client to demonstrate real-time sync (not started; tech to define).
 - TODO: finish auth: rotated refresh tokens (only short-lived access tokens are issued today). Remaining work of milestone 0 (Foundation); see the project's idea draft for the milestone order.

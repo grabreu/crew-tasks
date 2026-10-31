@@ -1,6 +1,5 @@
 using CrewTasks.Users.Data;
 using CrewTasks.Users.Features;
-using CrewTasks.Users.Google;
 using CrewTasks.Users.Identity;
 using CrewTasks.Users.Jwt;
 
@@ -51,14 +50,6 @@ public static class UsersModuleExtensions
 
         builder.Services.AddSingleton<ITokenService, JwtTokenService>();
 
-        builder.Services
-            .AddOptions<GoogleOptions>()
-            .BindConfiguration(GoogleOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        builder.Services.AddSingleton<IGoogleService, GoogleService>();
-
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         return builder;
@@ -68,7 +59,6 @@ public static class UsersModuleExtensions
     {
         endpoints.MapStartEmailSignInEndpoint();
         endpoints.MapCompleteEmailSignInEndpoint();
-        endpoints.MapSignInWithGoogleEndpoint();
         endpoints.MapGetCurrentUserEndpoint();
         endpoints.MapCompleteOnboardingEndpoint();
 

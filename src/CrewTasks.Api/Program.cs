@@ -37,7 +37,7 @@ app.MapDefaultEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(options => options.EnablePersistentAuthentication());
 }
 
 app.MapUsersModuleEndpoints();
