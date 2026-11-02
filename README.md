@@ -8,7 +8,7 @@ A backend for collaborative to-do lists shared by small groups (family, a school
 
 _Backend only, on purpose: there is no web frontend. The interface is the API reference (Scalar); a terminal client to show the real-time sync is planned (TODO, not started)._
 
-**[Try it live →](https://ca-crewtasks-api-prod-brs.niceforest-a8e8aad0.brazilsouth.azurecontainerapps.io)**
+**[Try it live →](https://crew-tasks.grabreu.dev)**
 
 Status: early stage. To-do list features and SignalR are not implemented yet.
 
