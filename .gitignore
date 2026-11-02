@@ -1,11 +1,5 @@
-.env
-.env.*
-!.env.example
-.DS_Store
-*.local
 bin/
 obj/
 .vs/
-.idea/
 *.user
 *.suo
