@@ -21,7 +21,7 @@ dotnet restore
 dotnet run --project src/CrewTasks.AppHost
 ```
 
-The AppHost starts SQL Server (persistent, with a data volume), MailPit (catches the sign-in code emails), and the API, and opens the Aspire dashboard. The `jwt-secret-key` parameter is generated and persisted. In Development the API applies EF Core migrations on startup and serves the API reference (Scalar) at `/scalar`; find its URL in the dashboard.
+The AppHost starts SQL Server (persistent, with a data volume), MailPit (catches the sign-in code emails), and the API, and opens the Aspire dashboard. The `jwt-secret-key` parameter is generated and persisted. The API applies EF Core migrations on startup and serves the API reference (Scalar) at `/scalar`; find its URL in the dashboard.
 
 Running `CrewTasks.Api` alone also works if you provide the `UsersDb` connection string, `Jwt:SecretKey`, and `Email:Host` (configuration is validated on start).
 

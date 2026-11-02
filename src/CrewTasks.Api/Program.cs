@@ -34,17 +34,11 @@ app.UseExceptionHandler();
 
 app.MapDefaultEndpoints();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference(options => options.EnablePersistentAuthentication());
-}
+app.MapOpenApi();
+app.MapScalarApiReference(options => options.EnablePersistentAuthentication());
 
 app.MapUsersModuleEndpoints();
 
-if (app.Environment.IsDevelopment())
-{
-    await app.EnsureUsersModuleDatabaseAsync();
-}
+await app.EnsureUsersModuleDatabaseAsync();
 
 await app.RunAsync();

@@ -49,7 +49,7 @@ Future-you revisiting this months later, or someone browsing the portfolio to se
 Modular monolith: one project per module (plus a `.Contracts` project for what other modules may reference), hosted by `CrewTasks.Api`. Modules talk through events in `*.Contracts`, never by referencing each other's internals.
 
 - `CrewTasks.slnx` - solution.
-- `src/CrewTasks.Api/` - host: `Program.cs`, `ValidationBehavior` (FluentValidation in the Mediator pipeline), `GlobalExceptionHandler`, OpenAPI transformers (Scalar in Development).
+- `src/CrewTasks.Api/` - host: `Program.cs`, `ValidationBehavior` (FluentValidation in the Mediator pipeline), `GlobalExceptionHandler`, OpenAPI transformers (Scalar).
 - `src/CrewTasks.Users/` - Users module (ASP.NET Core Identity, JWT, email-code sign-in).
   - `Features/` - one file per slice: request/command, validator, handler, and endpoint colocated.
   - `Data/` - `UsersDbContext` (schema `Users`), configurations, EF Core migrations, design-time factory.
@@ -58,7 +58,7 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
 - `src/CrewTasks.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
 - `src/CrewTasks.AppHost/` - .NET Aspire host for local development: SQL Server container, MailPit, and the API with its configuration.
 - `src/CrewTasks.ServiceDefaults/` - Aspire service defaults (OpenTelemetry, health checks, resilience).
-- `.github/` - `dependabot.yml` (actions, NuGet).
+- `.github/` - `dependabot.yml` (actions, NuGet, Docker).
 
 Commands, queries and events go through `Mediator` (source generator), results use `Desfecho`; packages are versioned centrally in `Directory.Packages.props`.
 
