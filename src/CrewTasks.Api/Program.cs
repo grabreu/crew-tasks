@@ -16,6 +16,11 @@ builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer<OpenApiVersioningTransformer>();
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddDocumentTransformer((document, _, _) =>
+    {
+        document.Servers = [];
+        return Task.CompletedTask;
+    });
     options.AddOperationTransformer<BearerSecuritySchemeTransformer>();
 });
 
@@ -36,6 +41,7 @@ app.MapDefaultEndpoints();
 
 app.MapOpenApi();
 app.MapScalarApiReference(options => options.EnablePersistentAuthentication());
+app.Map("/", () => Results.Redirect("/scalar"));
 
 app.MapUsersModuleEndpoints();
 
