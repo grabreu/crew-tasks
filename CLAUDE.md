@@ -58,7 +58,9 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
 - `src/CrewTasks.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
 - `src/CrewTasks.AppHost/` - .NET Aspire host for local development: SQL Server container, MailPit, and the API with its configuration.
 - `src/CrewTasks.ServiceDefaults/` - Aspire service defaults (OpenTelemetry, health checks, resilience).
-- `.github/` - `dependabot.yml` (actions, NuGet, Docker).
+- `src/CrewTasks.Api/Dockerfile` - API image (built from the repo root as context).
+- `infra/` - Bicep for Azure: `main.bicep`, `modules/sql-database.bicep`, `modules/container-app.bicep` (Container App using a system-assigned identity to reach SQL and ACR; the Container Apps environment and ACR are referenced as existing).
+- `.github/` - `ci.yml` (format check, build/test, Docker build), `cd.yml` (push image to ACR, update the Container App in the `prod` environment), `dependabot.yml` (actions, NuGet, Docker).
 
 Commands, queries and events go through `Mediator` (source generator), results use `Desfecho`; packages are versioned centrally in `Directory.Packages.props`.
 
