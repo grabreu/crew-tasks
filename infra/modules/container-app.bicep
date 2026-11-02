@@ -14,6 +14,12 @@ param sqlDatabaseName string
 param jwtSecretKey string
 
 param emailHost string
+param emailPort int
+param emailUsername string
+param emailFromAddress string
+
+@secure()
+param emailPassword string
 
 resource cae 'Microsoft.App/managedEnvironments@2026-01-01' existing = {
   name: 'cae-grabreu-prod-brs'
@@ -50,6 +56,10 @@ resource api 'Microsoft.App/containerApps@2026-01-01' = {
           name: 'jwt-secret-key'
           value: jwtSecretKey
         }
+        {
+          name: 'email-password'
+          value: emailPassword
+        }
       ]
     }
     template: {
@@ -73,6 +83,22 @@ resource api 'Microsoft.App/containerApps@2026-01-01' = {
             {
               name: 'Email__Host'
               value: emailHost
+            }
+            {
+              name: 'Email__Port'
+              value: string(emailPort)
+            }
+            {
+              name: 'Email__Username'
+              value: emailUsername
+            }
+            {
+              name: 'Email__Password'
+              secretRef: 'email-password'
+            }
+            {
+              name: 'Email__FromAddress'
+              value: emailFromAddress
             }
           ]
         }

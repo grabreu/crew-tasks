@@ -6,7 +6,16 @@ param image string
 @secure()
 param jwtSecretKey string
 
-param emailHost string
+param emailHost string = 'smtp.resend.com'
+
+param emailPort int = 465
+
+param emailUsername string = 'resend'
+
+param emailFromAddress string = 'no-reply@mail.grabreu.dev'
+
+@secure()
+param emailPassword string
 
 var tags = {
   project: 'crewtasks'
@@ -32,5 +41,9 @@ module api 'modules/container-app.bicep' = {
     sqlDatabaseName: db.outputs.sqlDatabaseName
     jwtSecretKey: jwtSecretKey
     emailHost: emailHost
+    emailPort: emailPort
+    emailUsername: emailUsername
+    emailFromAddress: emailFromAddress
+    emailPassword: emailPassword
   }
 }
