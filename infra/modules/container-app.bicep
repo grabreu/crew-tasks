@@ -29,6 +29,11 @@ resource acr 'Microsoft.ContainerRegistry/registries@2025-04-01' existing = {
   name: 'crgrabreuprod'
 }
 
+resource customDomainCertificate 'Microsoft.App/managedEnvironments/managedCertificates@2026-01-01' existing = {
+  parent: cae
+  name: 'mc-cae-grabreu-pr-crew-tasks-grabr-1015'
+}
+
 resource api 'Microsoft.App/containerApps@2026-01-01' = {
   name: 'ca-crewtasks-api-prod-brs'
   location: location
@@ -44,6 +49,13 @@ resource api 'Microsoft.App/containerApps@2026-01-01' = {
       ingress: {
         external: true
         targetPort: 8080
+        customDomains: [
+          {
+            name: 'crew-tasks.grabreu.dev'
+            certificateId: customDomainCertificate.id
+            bindingType: 'SniEnabled'
+          }
+        ]
       }
       registries: [
         {

@@ -86,7 +86,7 @@ jobs:
 
     environment:
       name: prod
-      url: https://ca-crewtasks-api-prod-brs.niceforest-a8e8aad0.brazilsouth.azurecontainerapps.io
+      url: https://crew-tasks.grabreu.dev
 
     permissions:
       contents: read
