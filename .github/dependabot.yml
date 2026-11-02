@@ -23,3 +23,10 @@ updates:
         update-types:
           - "minor"
           - "patch"
+
+  - package-ecosystem: "docker"
+    directory: "/src/CrewTasks.Api"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(docker)"
