@@ -2,16 +2,13 @@ using CrewTasks.Todos.Data;
 
 namespace CrewTasks.Todos.Features.TodoItems;
 
-public record ReopenTodoItemCommand(Guid UserId, Guid TodoListId, Guid TodoItemId) : ICommand<Result>;
+public record ReopenTodoItemCommand(Guid UserId, Guid TodoItemId) : ICommand<Result>;
 
 public class ReopenTodoItemValidator : AbstractValidator<ReopenTodoItemCommand>
 {
     public ReopenTodoItemValidator()
     {
         RuleFor(x => x.UserId)
-            .NotEmpty();
-
-        RuleFor(x => x.TodoListId)
             .NotEmpty();
 
         RuleFor(x => x.TodoItemId)
@@ -23,8 +20,8 @@ public class ReopenTodoItemHandler(TodosDbContext dbContext) : ICommandHandler<R
 {
     public async ValueTask<Result> Handle(ReopenTodoItemCommand command, CancellationToken cancellationToken)
     {
-        var todoItem = await dbContext.TodoItemsFor(command.UserId, command.TodoListId)
-            .SingleOrDefaultAsync(x => x.Id == command.TodoItemId, cancellationToken);
+        var todoItem = await dbContext.TodoItems
+            .SingleOrDefaultAsync(x => x.Id == command.TodoItemId && x.TodoList.Memberships.Any(m => m.UserId == command.UserId), cancellationToken);
 
         if (todoItem is null)
         {
@@ -44,7 +41,7 @@ public static class ReopenTodoItemEndpoint
     public static RouteHandlerBuilder MapReopenTodoItemEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapPost("/todo-lists/{todoListId:guid}/items/{todoItemId:guid}/reopen", HandleAsync)
+            .MapPost("/todo-items/{todoItemId:guid}/reopen", HandleAsync)
             .RequireAuthorization()
             .WithTags("TodoItems")
             .WithName("ReopenTodoItem")
@@ -55,9 +52,9 @@ public static class ReopenTodoItemEndpoint
             .ProducesProblem(StatusCodes.Status404NotFound);
     }
 
-    private static ValueTask<IResult> HandleAsync(Guid todoListId, Guid todoItemId, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
+    private static ValueTask<IResult> HandleAsync(Guid todoItemId, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
     {
         var userId = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return sender.Send(new ReopenTodoItemCommand(userId, todoListId, todoItemId), cancellationToken).ToNoContent();
+        return sender.Send(new ReopenTodoItemCommand(userId, todoItemId), cancellationToken).ToNoContent();
     }
 }

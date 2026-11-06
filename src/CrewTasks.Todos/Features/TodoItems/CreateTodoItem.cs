@@ -2,7 +2,7 @@ using CrewTasks.Todos.Data;
 
 namespace CrewTasks.Todos.Features.TodoItems;
 
-public record TodoItemDto(Guid Id, string Title, bool IsCompleted, DateTimeOffset CreatedAt);
+public record TodoItemDto(Guid Id, Guid TodoListId, string Title, bool IsCompleted, DateTimeOffset CreatedAt);
 
 public record CreateTodoItemCommand(Guid UserId, Guid TodoListId, string Title) : ICommand<Result<TodoItemDto>>;
 
@@ -40,7 +40,7 @@ public class CreateTodoItemHandler(TodosDbContext dbContext) : ICommandHandler<C
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return new TodoItemDto(todoItem.Id, todoItem.Title, todoItem.IsCompleted, todoItem.CreatedAt);
+        return new TodoItemDto(todoItem.Id, todoItem.TodoListId, todoItem.Title, todoItem.IsCompleted, todoItem.CreatedAt);
     }
 }
 
@@ -49,7 +49,7 @@ public static class CreateTodoItemEndpoint
     public static RouteHandlerBuilder MapCreateTodoItemEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapPost("/todo-lists/{todoListId:guid}/items", HandleAsync)
+            .MapPost("/todo-items", HandleAsync)
             .RequireAuthorization()
             .WithTags("TodoItems")
             .WithName("CreateTodoItem")
@@ -61,11 +61,11 @@ public static class CreateTodoItemEndpoint
             .ProducesProblem(StatusCodes.Status404NotFound);
     }
 
-    private static ValueTask<IResult> HandleAsync(Guid todoListId, CreateTodoItemRequest request, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
+    private static ValueTask<IResult> HandleAsync(CreateTodoItemRequest request, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
     {
         var userId = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return sender.Send(new CreateTodoItemCommand(userId, todoListId, request.Title), cancellationToken).ToCreated(item => $"/todo-lists/{todoListId}/items/{item.Id}");
+        return sender.Send(new CreateTodoItemCommand(userId, request.TodoListId, request.Title), cancellationToken).ToCreated(item => $"/todo-items/{item.Id}");
     }
 
-    public record CreateTodoItemRequest(string Title);
+    public record CreateTodoItemRequest(Guid TodoListId, string Title);
 }

@@ -2,16 +2,13 @@ using CrewTasks.Todos.Data;
 
 namespace CrewTasks.Todos.Features.TodoItems;
 
-public record ChangeTodoItemTitleCommand(Guid UserId, Guid TodoListId, Guid TodoItemId, string Title) : ICommand<Result>;
+public record ChangeTodoItemTitleCommand(Guid UserId, Guid TodoItemId, string Title) : ICommand<Result>;
 
 public class ChangeTodoItemTitleValidator : AbstractValidator<ChangeTodoItemTitleCommand>
 {
     public ChangeTodoItemTitleValidator()
     {
         RuleFor(x => x.UserId)
-            .NotEmpty();
-
-        RuleFor(x => x.TodoListId)
             .NotEmpty();
 
         RuleFor(x => x.TodoItemId)
@@ -27,8 +24,8 @@ public class ChangeTodoItemTitleHandler(TodosDbContext dbContext) : ICommandHand
 {
     public async ValueTask<Result> Handle(ChangeTodoItemTitleCommand command, CancellationToken cancellationToken)
     {
-        var todoItem = await dbContext.TodoItemsFor(command.UserId, command.TodoListId)
-            .SingleOrDefaultAsync(x => x.Id == command.TodoItemId, cancellationToken);
+        var todoItem = await dbContext.TodoItems
+            .SingleOrDefaultAsync(x => x.Id == command.TodoItemId && x.TodoList.Memberships.Any(m => m.UserId == command.UserId), cancellationToken);
 
         if (todoItem is null)
         {
@@ -48,7 +45,7 @@ public static class ChangeTodoItemTitleEndpoint
     public static RouteHandlerBuilder MapChangeTodoItemTitleEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapPut("/todo-lists/{todoListId:guid}/items/{todoItemId:guid}/title", HandleAsync)
+            .MapPut("/todo-items/{todoItemId:guid}/title", HandleAsync)
             .RequireAuthorization()
             .WithTags("TodoItems")
             .WithName("ChangeTodoItemTitle")
@@ -60,10 +57,10 @@ public static class ChangeTodoItemTitleEndpoint
             .ProducesProblem(StatusCodes.Status404NotFound);
     }
 
-    private static ValueTask<IResult> HandleAsync(Guid todoListId, Guid todoItemId, ChangeTodoItemTitleRequest request, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
+    private static ValueTask<IResult> HandleAsync(Guid todoItemId, ChangeTodoItemTitleRequest request, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
     {
         var userId = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return sender.Send(new ChangeTodoItemTitleCommand(userId, todoListId, todoItemId, request.Title), cancellationToken).ToNoContent();
+        return sender.Send(new ChangeTodoItemTitleCommand(userId, todoItemId, request.Title), cancellationToken).ToNoContent();
     }
 
     public record ChangeTodoItemTitleRequest(string Title);

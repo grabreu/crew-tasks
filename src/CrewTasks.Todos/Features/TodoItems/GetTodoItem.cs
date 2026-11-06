@@ -2,16 +2,13 @@ using CrewTasks.Todos.Data;
 
 namespace CrewTasks.Todos.Features.TodoItems;
 
-public record GetTodoItemQuery(Guid UserId, Guid TodoListId, Guid TodoItemId) : IQuery<Result<TodoItemDto>>;
+public record GetTodoItemQuery(Guid UserId, Guid TodoItemId) : IQuery<Result<TodoItemDto>>;
 
 public class GetTodoItemValidator : AbstractValidator<GetTodoItemQuery>
 {
     public GetTodoItemValidator()
     {
         RuleFor(x => x.UserId)
-            .NotEmpty();
-
-        RuleFor(x => x.TodoListId)
             .NotEmpty();
 
         RuleFor(x => x.TodoItemId)
@@ -23,10 +20,10 @@ public class GetTodoItemHandler(TodosDbContext dbContext) : IQueryHandler<GetTod
 {
     public async ValueTask<Result<TodoItemDto>> Handle(GetTodoItemQuery query, CancellationToken cancellationToken)
     {
-        var todoItem = await dbContext.TodoItemsFor(query.UserId, query.TodoListId)
+        var todoItem = await dbContext.TodoItems
             .AsNoTracking()
-            .Where(x => x.Id == query.TodoItemId)
-            .Select(x => new TodoItemDto(x.Id, x.Title, x.IsCompleted, x.CreatedAt))
+            .Where(x => x.Id == query.TodoItemId && x.TodoList.Memberships.Any(m => m.UserId == query.UserId))
+            .Select(x => new TodoItemDto(x.Id, x.TodoListId, x.Title, x.IsCompleted, x.CreatedAt))
             .SingleOrDefaultAsync(cancellationToken);
 
         if (todoItem is null)
@@ -43,7 +40,7 @@ public static class GetTodoItemEndpoint
     public static RouteHandlerBuilder MapGetTodoItemEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapGet("/todo-lists/{todoListId:guid}/items/{todoItemId:guid}", HandleAsync)
+            .MapGet("/todo-items/{todoItemId:guid}", HandleAsync)
             .RequireAuthorization()
             .WithTags("TodoItems")
             .WithName("GetTodoItem")
@@ -54,9 +51,9 @@ public static class GetTodoItemEndpoint
             .ProducesProblem(StatusCodes.Status404NotFound);
     }
 
-    private static ValueTask<IResult> HandleAsync(Guid todoListId, Guid todoItemId, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
+    private static ValueTask<IResult> HandleAsync(Guid todoItemId, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
     {
         var userId = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return sender.Send(new GetTodoItemQuery(userId, todoListId, todoItemId), cancellationToken).ToOk();
+        return sender.Send(new GetTodoItemQuery(userId, todoItemId), cancellationToken).ToOk();
     }
 }

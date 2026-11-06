@@ -2,16 +2,13 @@ using CrewTasks.Todos.Data;
 
 namespace CrewTasks.Todos.Features.TodoItems;
 
-public record DeleteTodoItemCommand(Guid UserId, Guid TodoListId, Guid TodoItemId) : ICommand<Result>;
+public record DeleteTodoItemCommand(Guid UserId, Guid TodoItemId) : ICommand<Result>;
 
 public class DeleteTodoItemValidator : AbstractValidator<DeleteTodoItemCommand>
 {
     public DeleteTodoItemValidator()
     {
         RuleFor(x => x.UserId)
-            .NotEmpty();
-
-        RuleFor(x => x.TodoListId)
             .NotEmpty();
 
         RuleFor(x => x.TodoItemId)
@@ -23,8 +20,8 @@ public class DeleteTodoItemHandler(TodosDbContext dbContext) : ICommandHandler<D
 {
     public async ValueTask<Result> Handle(DeleteTodoItemCommand command, CancellationToken cancellationToken)
     {
-        var todoItem = await dbContext.TodoItemsFor(command.UserId, command.TodoListId)
-            .SingleOrDefaultAsync(x => x.Id == command.TodoItemId, cancellationToken);
+        var todoItem = await dbContext.TodoItems
+            .SingleOrDefaultAsync(x => x.Id == command.TodoItemId && x.TodoList.Memberships.Any(m => m.UserId == command.UserId), cancellationToken);
 
         if (todoItem is null)
         {
@@ -44,7 +41,7 @@ public static class DeleteTodoItemEndpoint
     public static RouteHandlerBuilder MapDeleteTodoItemEndpoint(this IEndpointRouteBuilder endpoints)
     {
         return endpoints
-            .MapDelete("/todo-lists/{todoListId:guid}/items/{todoItemId:guid}", HandleAsync)
+            .MapDelete("/todo-items/{todoItemId:guid}", HandleAsync)
             .RequireAuthorization()
             .WithTags("TodoItems")
             .WithName("DeleteTodoItem")
@@ -55,9 +52,9 @@ public static class DeleteTodoItemEndpoint
             .ProducesProblem(StatusCodes.Status404NotFound);
     }
 
-    private static ValueTask<IResult> HandleAsync(Guid todoListId, Guid todoItemId, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
+    private static ValueTask<IResult> HandleAsync(Guid todoItemId, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
     {
         var userId = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return sender.Send(new DeleteTodoItemCommand(userId, todoListId, todoItemId), cancellationToken).ToNoContent();
+        return sender.Send(new DeleteTodoItemCommand(userId, todoItemId), cancellationToken).ToNoContent();
     }
 }

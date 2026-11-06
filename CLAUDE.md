@@ -71,6 +71,8 @@ Commands, queries and events go through `Mediator` (source generator), results u
 
 All modules share one SQL database: each has its own `DbContext` (connection strings `UsersDb`, `TodosDb`), its own schema, and its own `__EFMigrationsHistory` table inside that schema; there are no foreign keys across schemas.
 
+Todo items are a flat resource (`/todo-items`, addressed by their own id); the list id travels in the body on creation and as a filter on listing. Access to a list is checked inside each handler, by querying through the user's membership; a user who is not a member gets 404.
+
 Auth issues short-lived JWT access tokens only (`AccessTokenExpirationMinutes`, 15 in `appsettings.json`); there is no refresh token by design, the client signs in again with a new email code.
 
 Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints` extension methods that `Program.cs` calls. Options (`Jwt`, `Email`) are validated on start, so the API does not boot without them.
