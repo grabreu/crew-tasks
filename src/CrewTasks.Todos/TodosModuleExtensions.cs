@@ -1,5 +1,6 @@
 using CrewTasks.Todos.Data;
-using CrewTasks.Todos.Features;
+using CrewTasks.Todos.Features.TodoItems;
+using CrewTasks.Todos.Features.TodoLists;
 
 namespace CrewTasks.Todos;
 
@@ -24,6 +25,13 @@ public static class TodosModuleExtensions
         endpoints.MapGetTodoListEndpoint();
         endpoints.MapRenameTodoListEndpoint();
         endpoints.MapDeleteTodoListEndpoint();
+        endpoints.MapCreateTodoItemEndpoint();
+        endpoints.MapGetTodoItemsEndpoint();
+        endpoints.MapGetTodoItemEndpoint();
+        endpoints.MapChangeTodoItemTitleEndpoint();
+        endpoints.MapCompleteTodoItemEndpoint();
+        endpoints.MapReopenTodoItemEndpoint();
+        endpoints.MapDeleteTodoItemEndpoint();
 
         return endpoints;
     }

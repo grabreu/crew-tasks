@@ -23,9 +23,36 @@ namespace CrewTasks.Todos.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CrewTasks.Todos.Entities.TodoItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("TodoListId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TodoListId");
+
+                    b.ToTable("TodoItems", "Todos");
+                });
+
             modelBuilder.Entity("CrewTasks.Todos.Entities.TodoList", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -67,6 +94,17 @@ namespace CrewTasks.Todos.Data.Migrations
                     b.ToTable("TodoListMemberships", "Todos");
                 });
 
+            modelBuilder.Entity("CrewTasks.Todos.Entities.TodoItem", b =>
+                {
+                    b.HasOne("CrewTasks.Todos.Entities.TodoList", "TodoList")
+                        .WithMany("Items")
+                        .HasForeignKey("TodoListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TodoList");
+                });
+
             modelBuilder.Entity("CrewTasks.Todos.Entities.TodoListMembership", b =>
                 {
                     b.HasOne("CrewTasks.Todos.Entities.TodoList", "TodoList")
@@ -80,6 +118,8 @@ namespace CrewTasks.Todos.Data.Migrations
 
             modelBuilder.Entity("CrewTasks.Todos.Entities.TodoList", b =>
                 {
+                    b.Navigation("Items");
+
                     b.Navigation("Memberships");
                 });
 #pragma warning restore 612, 618

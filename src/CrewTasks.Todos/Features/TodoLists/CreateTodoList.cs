@@ -1,7 +1,7 @@
 using CrewTasks.Todos.Data;
 using CrewTasks.Todos.Entities;
 
-namespace CrewTasks.Todos.Features;
+namespace CrewTasks.Todos.Features.TodoLists;
 
 public record TodoListDto(Guid Id, string Name, DateTimeOffset CreatedAt);
 
