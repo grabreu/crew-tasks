@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CrewTasks.Notifications\CrewTasks.Notifications.csproj" />
     <ProjectReference Include="..\CrewTasks.ServiceDefaults\CrewTasks.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\CrewTasks.Todos\CrewTasks.Todos.csproj" />
     <ProjectReference Include="..\CrewTasks.Users\CrewTasks.Users.csproj" />
   </ItemGroup>
 

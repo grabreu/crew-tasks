@@ -7,9 +7,12 @@ namespace CrewTasks.Users;
 
 public static class UsersModuleExtensions
 {
+    public const string Schema = "Users";
+    public const string MigrationsHistoryTable = "__EFMigrationsHistory";
+
     public static IHostApplicationBuilder AddUsersModuleServices(this IHostApplicationBuilder builder)
     {
-        builder.AddSqlServerDbContext<UsersDbContext>("UsersDb");
+        builder.AddSqlServerDbContext<UsersDbContext>("UsersDb", configureDbContextOptions: options => options.UseSqlServer(sql => sql.MigrationsHistoryTable(MigrationsHistoryTable, Schema)));
 
         builder.Services
             .AddIdentityCore<ApplicationUser>(options =>

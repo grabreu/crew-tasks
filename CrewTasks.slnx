@@ -2,6 +2,10 @@
   <Folder Name="/Notifications Module/">
     <Project Path="src/CrewTasks.Notifications/CrewTasks.Notifications.csproj" Id="7661ee71-1876-41d6-9c40-0704c0bcb720" />
   </Folder>
+  <Folder Name="/Todos Module/">
+    <Project Path="src/CrewTasks.Todos.Contracts/CrewTasks.Todos.Contracts.csproj" Id="5c1f0a7e-3b2d-4e8a-9f61-2d7b8c4a1e30" />
+    <Project Path="src/CrewTasks.Todos/CrewTasks.Todos.csproj" Id="e92a4b6d-71c3-4f05-b8d2-6a3e9f0c5d17" />
+  </Folder>
   <Folder Name="/Users Module/">
     <Project Path="src/CrewTasks.Users.Contracts/CrewTasks.Users.Contracts.csproj" Id="8aed7bfb-916e-4e39-919b-1490b98c3081" />
     <Project Path="src/CrewTasks.Users/CrewTasks.Users.csproj" Id="ad613ddb-661d-4f61-93a4-9cb3fd5868cb" />

@@ -10,17 +10,18 @@ _Backend only, on purpose: there is no web frontend. The interface is the API re
 
 **[Try it live →](https://crew-tasks.grabreu.dev)**
 
-Status: early stage. To-do list features and SignalR are not implemented yet.
+Status: early stage. To-do lists are implemented; items and SignalR are not yet.
 
 ## Tech stack
 
-.NET 10 (ASP.NET Core), modular monolith (Users, Notifications) with Vertical Slice Architecture · ASP.NET Core Identity + JWT · EF Core + SQL Server · Mediator + FluentValidation + Desfecho · MailKit · .NET Aspire for local orchestration · Scalar · planned: SignalR
+.NET 10 (ASP.NET Core), modular monolith (Users, Todos, Notifications) with Vertical Slice Architecture · ASP.NET Core Identity + JWT · EF Core + SQL Server · Mediator + FluentValidation + Desfecho · MailKit · .NET Aspire for local orchestration · Scalar · planned: SignalR
 
 ## Features
 
 - **Passwordless sign-in**: a 6-digit code sent by email, exchanged for a short-lived access token; the user is created on first sign-in.
 - **Onboarding**: the display name is set once after the first sign-in.
 - **Current user**
+- **To-do lists**: create, list, rename, and delete lists. The creator is the owner and only the owner can delete; a list you do not belong to responds 404.
 
 | Method | Route | Auth | Purpose |
 | --- | --- | --- | --- |
@@ -28,6 +29,11 @@ Status: early stage. To-do list features and SignalR are not implemented yet.
 | POST | `/auth/email/sign-in/complete` | anonymous | Exchanges email + code for an access token. |
 | GET | `/users/me` | bearer | Current user. |
 | POST | `/users/me/onboarding` | bearer | Sets the display name once. |
+| POST | `/todo-lists` | bearer | Creates a list owned by the current user. |
+| GET | `/todo-lists` | bearer | Lists the current user's lists, oldest first. |
+| GET | `/todo-lists/{todoListId}` | bearer | Gets a list the current user belongs to. |
+| PUT | `/todo-lists/{todoListId}` | bearer | Renames a list. |
+| DELETE | `/todo-lists/{todoListId}` | bearer | Deletes a list (owner only). |
 
 ## Development
 

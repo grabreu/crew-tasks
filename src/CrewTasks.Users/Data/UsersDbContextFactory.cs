@@ -5,7 +5,7 @@ public class UsersDbContextFactory : IDesignTimeDbContextFactory<UsersDbContext>
     public UsersDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<UsersDbContext>();
-        optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=UsersDb;Trusted_Connection=True;MultipleActiveResultSets=true");
+        optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=UsersDb;Trusted_Connection=True;MultipleActiveResultSets=true", sql => sql.MigrationsHistoryTable(UsersModuleExtensions.MigrationsHistoryTable, UsersModuleExtensions.Schema));
 
         return new UsersDbContext(optionsBuilder.Options);
     }

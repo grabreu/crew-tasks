@@ -3,6 +3,7 @@ using CrewTasks.Api.ExceptionHandling;
 using CrewTasks.Api.OpenApi;
 using CrewTasks.Notifications;
 using CrewTasks.ServiceDefaults;
+using CrewTasks.Todos;
 using CrewTasks.Users;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,7 @@ builder.Services.AddMediator(options =>
 });
 
 builder.AddUsersModuleServices();
+builder.AddTodosModuleServices();
 builder.AddNotificationsModuleServices();
 
 var app = builder.Build();
@@ -44,7 +46,9 @@ app.MapScalarApiReference(options => options.EnablePersistentAuthentication());
 app.Map("/", () => Results.Redirect("/scalar"));
 
 app.MapUsersModuleEndpoints();
+app.MapTodosModuleEndpoints();
 
 await app.EnsureUsersModuleDatabaseAsync();
+await app.EnsureTodosModuleDatabaseAsync();
 
 await app.RunAsync();

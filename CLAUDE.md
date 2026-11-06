@@ -2,9 +2,9 @@
 
 ## Repository
 
-Backend for collaborative to-do lists shared by small groups (family, school group, small team), synced in real time for everyone viewing a list. Not a project-management tool, no boards. Backend only by design: no web frontend, the API reference (Scalar) is the interface.
+Backend for collaborative to-do lists shared by small groups (family, school group, small team), synced in real time for everyone viewing a list. Not a project-management tool, no boards. Backend only by design: no web frontend, the API reference (Scalar) is the interface. Scope stays lean: lists, items, members, and share-link invites; no comments, attachments, reminders, or labels.
 
-Read `README.md` before making changes: it documents the project pitch, tech stack, and how to run it. Significant, hard-to-reverse decisions are recorded in `docs/adr/` (created with the first one): check it before revisiting one, and add an entry when making a new one.
+Read `README.md` before making changes: it documents the project pitch, tech stack, and how to run it. Significant, hard-to-reverse decisions are recorded in `docs/adr/`: check it before revisiting one, and add an entry when making a new one.
 
 ## General Rules
 
@@ -55,6 +55,11 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
   - `Data/` - `UsersDbContext` (schema `Users`), configurations, EF Core migrations, design-time factory.
   - `Identity/`, `Jwt/` - `ApplicationUser`, token issuing.
 - `src/CrewTasks.Users.Contracts/` - integration events published by Users (`EmailSignInStartedEvent`).
+- `src/CrewTasks.Todos/` - Todos module: to-do lists and their memberships (owner/member).
+  - `Features/` - one file per slice (create, get one, get all, rename, delete).
+  - `Entities/` - `TodoList` and `TodoListMembership` (private setters, changed through methods).
+  - `Data/` - `TodosDbContext` (schema `Todos`), configurations, EF Core migrations, design-time factory.
+- `src/CrewTasks.Todos.Contracts/` - integration events published by Todos (none yet).
 - `src/CrewTasks.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
 - `src/CrewTasks.AppHost/` - .NET Aspire host for local development: SQL Server container, MailPit, and the API with its configuration.
 - `src/CrewTasks.ServiceDefaults/` - Aspire service defaults (OpenTelemetry, health checks, resilience).
@@ -64,6 +69,10 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
 
 Commands, queries and events go through `Mediator` (source generator), results use `Desfecho`; packages are versioned centrally in `Directory.Packages.props`.
 
+All modules share one SQL database: each has its own `DbContext` (connection strings `UsersDb`, `TodosDb`), its own schema, and its own `__EFMigrationsHistory` table inside that schema; there are no foreign keys across schemas.
+
+Auth issues short-lived JWT access tokens only (`AccessTokenExpirationMinutes`, 15 in `appsettings.json`); there is no refresh token by design, the client signs in again with a new email code.
+
 Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints` extension methods that `Program.cs` calls. Options (`Jwt`, `Email`) are validated on start, so the API does not boot without them.
 
 ### Validation
@@ -72,7 +81,5 @@ Run from the repo root: `dotnet restore`, `dotnet build --no-restore -c Release`
 
 ### Open Questions
 
-- TODO: scope is meant to stay lean: lists, items, members, and share-link invites; no comments, attachments, reminders, or labels. Confirm before building.
 - TODO: terminal client to demonstrate real-time sync (not started; tech to define).
-- TODO: finish auth: rotated refresh tokens (only short-lived access tokens are issued today). Remaining work of milestone 0 (Foundation); see the project's idea draft for the milestone order.
-- TODO: no to-do list features or SignalR yet.
+- TODO: no to-do items or SignalR yet; only lists and memberships exist. Next is the rest of milestone 1 of the project's idea draft (item CRUD for a single user).

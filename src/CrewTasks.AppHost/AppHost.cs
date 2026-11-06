@@ -10,16 +10,17 @@ var sql = builder.AddSqlServer("sql")
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent);
 
-var usersDb = sql.AddDatabase("usersdb");
+var sqldb = sql.AddDatabase("sqldb");
 
 var mailpit = builder.AddMailPit("mailpit");
 
 builder.AddProject<Projects.CrewTasks_Api>("api")
-    .WithReference(usersDb)
-    .WaitFor(usersDb)
+    .WithReference(sqldb, "UsersDb")
+    .WithReference(sqldb, "TodosDb")
     .WithEnvironment("Jwt__SecretKey", jwtSecretKey)
     .WithEnvironment("Email__Host", mailpit.Resource.PrimaryEndpoint.Property(EndpointProperty.Host))
     .WithEnvironment("Email__Port", mailpit.Resource.PrimaryEndpoint.Property(EndpointProperty.Port))
+    .WaitFor(sqldb)
     .WaitFor(mailpit);
 
 var app = builder.Build();
