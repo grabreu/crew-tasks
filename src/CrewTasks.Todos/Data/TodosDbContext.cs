@@ -6,6 +6,7 @@ public class TodosDbContext(DbContextOptions<TodosDbContext> options) : DbContex
 {
     public DbSet<TodoList> TodoLists => Set<TodoList>();
     public DbSet<TodoListMembership> TodoListMemberships => Set<TodoListMembership>();
+    public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

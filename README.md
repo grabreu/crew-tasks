@@ -10,7 +10,7 @@ _Backend only, on purpose: there is no web frontend. The interface is the API re
 
 **[Try it live →](https://crew-tasks.grabreu.dev)**
 
-Status: early stage. To-do lists are implemented; items and SignalR are not yet.
+Status: early stage. To-do lists and items are implemented; SignalR is not yet.
 
 ## Tech stack
 
@@ -22,6 +22,7 @@ Status: early stage. To-do lists are implemented; items and SignalR are not yet.
 - **Onboarding**: the display name is set once after the first sign-in.
 - **Current user**
 - **To-do lists**: create, list, rename, and delete lists. The creator is the owner and only the owner can delete; a list you do not belong to responds 404.
+- **To-do items**: create an item in a list, list your items across all your lists (filtered by list or completion), change the title, complete, reopen, and delete. Any member of the list can change its items; an item of a list you do not belong to responds 404.
 
 | Method | Route | Auth | Purpose |
 | --- | --- | --- | --- |
@@ -33,7 +34,14 @@ Status: early stage. To-do lists are implemented; items and SignalR are not yet.
 | GET | `/todo-lists` | bearer | Lists the current user's lists, oldest first. |
 | GET | `/todo-lists/{todoListId}` | bearer | Gets a list the current user belongs to. |
 | PUT | `/todo-lists/{todoListId}` | bearer | Renames a list. |
-| DELETE | `/todo-lists/{todoListId}` | bearer | Deletes a list (owner only). |
+| DELETE | `/todo-lists/{todoListId}` | bearer | Deletes a list and its items (owner only). |
+| POST | `/todo-items` | bearer | Creates an item in a list (`todoListId` in the body). |
+| GET | `/todo-items` | bearer | Lists the items of the user's lists, oldest first; optional `todoListId` and `isCompleted` filters. |
+| GET | `/todo-items/{todoItemId}` | bearer | Gets an item. |
+| PUT | `/todo-items/{todoItemId}/title` | bearer | Changes the title of an item. |
+| POST | `/todo-items/{todoItemId}/complete` | bearer | Completes an item. |
+| POST | `/todo-items/{todoItemId}/reopen` | bearer | Reopens a completed item. |
+| DELETE | `/todo-items/{todoItemId}` | bearer | Deletes an item. |
 
 ## Development
 

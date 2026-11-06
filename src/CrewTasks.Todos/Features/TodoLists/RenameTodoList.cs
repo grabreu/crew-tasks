@@ -1,6 +1,6 @@
 using CrewTasks.Todos.Data;
 
-namespace CrewTasks.Todos.Features;
+namespace CrewTasks.Todos.Features.TodoLists;
 
 public record RenameTodoListCommand(Guid UserId, Guid TodoListId, string Name) : ICommand<Result>;
 

@@ -55,9 +55,9 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
   - `Data/` - `UsersDbContext` (schema `Users`), configurations, EF Core migrations, design-time factory.
   - `Identity/`, `Jwt/` - `ApplicationUser`, token issuing.
 - `src/CrewTasks.Users.Contracts/` - integration events published by Users (`EmailSignInStartedEvent`).
-- `src/CrewTasks.Todos/` - Todos module: to-do lists and their memberships (owner/member).
-  - `Features/` - one file per slice (create, get one, get all, rename, delete).
-  - `Entities/` - `TodoList` and `TodoListMembership` (private setters, changed through methods).
+- `src/CrewTasks.Todos/` - Todos module: to-do lists, their memberships (owner/member), and their items.
+  - `Features/` - one file per slice, grouped by entity: `TodoLists/` (create, get one, get all, rename, delete) and `TodoItems/` (create, get one, get all, change title, complete, reopen, delete).
+  - `Entities/` - `TodoList`, `TodoListMembership`, and `TodoItem` (private setters, changed through methods).
   - `Data/` - `TodosDbContext` (schema `Todos`), configurations, EF Core migrations, design-time factory.
 - `src/CrewTasks.Todos.Contracts/` - integration events published by Todos (none yet).
 - `src/CrewTasks.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
@@ -71,6 +71,8 @@ Commands, queries and events go through `Mediator` (source generator), results u
 
 All modules share one SQL database: each has its own `DbContext` (connection strings `UsersDb`, `TodosDb`), its own schema, and its own `__EFMigrationsHistory` table inside that schema; there are no foreign keys across schemas.
 
+Todo items are a flat resource (`/todo-items`, addressed by their own id); the list id travels in the body on creation and as a filter on listing. Access to a list is checked inside each handler, by querying through the user's membership; a user who is not a member gets 404.
+
 Auth issues short-lived JWT access tokens only (`AccessTokenExpirationMinutes`, 15 in `appsettings.json`); there is no refresh token by design, the client signs in again with a new email code.
 
 Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints` extension methods that `Program.cs` calls. Options (`Jwt`, `Email`) are validated on start, so the API does not boot without them.
@@ -82,4 +84,4 @@ Run from the repo root: `dotnet restore`, `dotnet build --no-restore -c Release`
 ### Open Questions
 
 - TODO: terminal client to demonstrate real-time sync (not started; tech to define).
-- TODO: no to-do items or SignalR yet; only lists and memberships exist. Next is the rest of milestone 1 of the project's idea draft (item CRUD for a single user).
+- TODO: no SignalR yet; lists, memberships, and items exist (milestone 1 of the project's idea draft is done). Next is milestone 2: optimistic concurrency on item mutations.

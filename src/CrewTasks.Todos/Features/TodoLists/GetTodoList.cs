@@ -1,6 +1,6 @@
 using CrewTasks.Todos.Data;
 
-namespace CrewTasks.Todos.Features;
+namespace CrewTasks.Todos.Features.TodoLists;
 
 public record GetTodoListQuery(Guid UserId, Guid TodoListId) : IQuery<Result<TodoListDto>>;
 

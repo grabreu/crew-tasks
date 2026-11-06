@@ -1,6 +1,6 @@
 using CrewTasks.Todos.Data;
 
-namespace CrewTasks.Todos.Features;
+namespace CrewTasks.Todos.Features.TodoLists;
 
 public record DeleteTodoListCommand(Guid UserId, Guid TodoListId) : ICommand<Result>;
 

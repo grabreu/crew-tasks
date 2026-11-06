@@ -3,6 +3,7 @@ namespace CrewTasks.Todos.Entities;
 public class TodoList
 {
     private readonly List<TodoListMembership> _memberships = [];
+    private readonly List<TodoItem> _items = [];
 
     private TodoList()
     {
@@ -23,6 +24,7 @@ public class TodoList
     public Guid OwnerId { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public IReadOnlyCollection<TodoListMembership> Memberships => _memberships;
+    public IReadOnlyCollection<TodoItem> Items => _items;
 
     public void Rename(string name)
     {
@@ -32,5 +34,13 @@ public class TodoList
     public void AddMember(Guid userId, TodoListRole role = TodoListRole.Member)
     {
         _memberships.Add(new TodoListMembership(Id, userId, role));
+    }
+
+    public TodoItem AddItem(string title)
+    {
+        var item = new TodoItem(Id, title);
+        _items.Add(item);
+
+        return item;
     }
 }
