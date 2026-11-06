@@ -21,6 +21,8 @@ param emailFromAddress string
 @secure()
 param emailPassword string
 
+var dbConnectionString = 'Server=tcp:${sqlServerFqdn},1433;Database=${sqlDatabaseName};Authentication=Active Directory Managed Identity;Encrypt=True'
+
 resource cae 'Microsoft.App/managedEnvironments@2026-01-01' existing = {
   name: 'cae-grabreu-prod-brs'
 }
@@ -86,7 +88,11 @@ resource api 'Microsoft.App/containerApps@2026-01-01' = {
           env: [
             {
               name: 'ConnectionStrings__UsersDb'
-              value: 'Server=tcp:${sqlServerFqdn},1433;Database=${sqlDatabaseName};Authentication=Active Directory Managed Identity;Encrypt=True'
+              value: dbConnectionString
+            }
+            {
+              name: 'ConnectionStrings__TodosDb'
+              value: dbConnectionString
             }
             {
               name: 'Jwt__SecretKey'
