@@ -1,0 +1,9 @@
+# Azure Container Apps hosting, Bicep, OIDC federated credential
+
+Hosted on Azure Container Apps (Consumption plan) with Azure SQL (serverless, free tier). The Container Apps environment and the container registry are shared infrastructure created outside this repo and only referenced here as `existing`. The app's infrastructure is declared in Bicep (`infra/`) and deployed by hand: the Container App, its secrets (JWT key, email password), and the SQL database. The Container App uses a system-assigned identity to reach SQL and the registry, so no database password or registry credential exists.
+
+GitHub Actions deploys through an OIDC federated credential scoped to the `prod` environment, so no Azure credential is stored in GitHub. CD pushes the image to the registry and runs `az containerapp update --image` with the immutable digest; it never touches configuration or secrets, which only change through a Bicep deployment.
+
+Custom domain (`crew-tasks.grabreu.dev`) is bound with Container Apps' free managed certificate, with DNS on Cloudflare. The CNAME and the `asuid` TXT record must stay **DNS only** (unproxied), because the managed certificate validation needs the CNAME to resolve directly to the app. The certificate is created through the CLI (it needs the hostname bound first) and referenced as `existing` in the Bicep.
+
+**Consequences**: a Bicep deployment is a manual step whenever configuration, secrets, or infrastructure change, and it requires the current image reference so it does not revert what CD published. Deleting and recreating the custom domain changes the managed certificate name, which must then be updated in the Bicep. Deploying by digest makes the Azure Portal show an error on the Containers blade, because it expects an image tag; the deployment itself is not affected and the CLI is the interface used.

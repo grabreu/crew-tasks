@@ -1,0 +1,9 @@
+# Passwordless email-code sign-in with a short-lived JWT, no refresh token
+
+Users sign in with a 6-digit code sent by email, which is exchanged for a JWT access token; the account is created on the first sign-in. There is no password, so there are no registration, email confirmation, or password reset flows. The code comes from ASP.NET Core Identity's email token provider.
+
+JWT bearer was chosen over cookies because the clients are not browsers (a terminal client, possibly a Flutter client later), so there is no cookie jar to rely on. Only an access token is issued, valid for 15 minutes (`AccessTokenExpirationMinutes`). There is no refresh token: when it expires, the client signs in again with a new email code. That keeps the auth surface small (no token table, no rotation, no reuse detection). Logout is client-side only; a token stays valid until it expires, which is why the lifetime is short.
+
+Tokens are issued by hand: `JwtTokenService` builds and signs the JWT (HS256) with `Microsoft.IdentityModel.JsonWebTokens`, and `UserManager` handles the user underneath. Considered and not chosen: OpenIddict and Duende IdentityServer, which are full OAuth2/OIDC servers meant for being an identity provider to several relying parties, while this API only issues tokens to its own clients; and `MapIdentityApi`, whose access tokens use Identity's own data-protected format instead of a real JWT that `JwtBearer` validation and SignalR's access token provider can use.
+
+**Consequences**: a client must go through the email code again every 15 minutes, a cost accepted for an API without a browser frontend. The signing key is a shared secret stored as the `jwt-secret-key` Container App secret, and changing it invalidates every issued token. If refresh tokens, social login, or more than one relying party are needed later, this should be revisited, most likely with an OIDC server.
