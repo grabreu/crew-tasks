@@ -2,7 +2,7 @@
 
 ## Repository
 
-Backend for collaborative to-do lists shared by small groups (family, school group, small team), synced in real time for everyone viewing a list. Not a project-management tool, no boards. Backend only by design: no web frontend, the API reference (Scalar) is the interface. Scope stays lean: lists, items, members, and share-link invites; no comments, attachments, reminders, or labels.
+Backend for collaborative to-do lists shared by small groups (family, school group, small team). Not a project-management tool, no boards. Backend only by design: no web frontend, the API reference (Scalar) is the interface. Scope stays lean: lists, items, members, and share-link invites; no comments, attachments, reminders, or labels.
 
 Read `README.md` before making changes: it documents the project pitch, tech stack, and how to run it. Significant, hard-to-reverse decisions are recorded in `docs/adr/`: check it before revisiting one, and add an entry when making a new one.
 
@@ -82,8 +82,3 @@ Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints`
 ### Validation
 
 Run from the repo root: `dotnet restore`, `dotnet build --no-restore -c Release`, `dotnet format --no-restore --verify-no-changes --severity info` before considering a change done.
-
-### Open Questions
-
-- TODO: terminal client to demonstrate real-time sync (not started; tech to define).
-- TODO: no SignalR yet; lists, memberships, and items with optimistic concurrency exist (milestones 1 and 2 of the project's idea draft are done). Next is milestone 3: real-time sync with SignalR.

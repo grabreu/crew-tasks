@@ -4,17 +4,17 @@
 [![CD](https://github.com/grabreu/crew-tasks/actions/workflows/cd.yml/badge.svg?branch=main)](https://github.com/grabreu/crew-tasks/actions/workflows/cd.yml)
 [![License](https://img.shields.io/github/license/grabreu/crew-tasks?style=flat-square)](LICENSE)
 
-A backend for collaborative to-do lists shared by small groups (family, a school group, a small team), synced in real time for everyone looking at a list. Not a project-management tool, no Trello-style boards.
+A backend for collaborative to-do lists shared by small groups (family, a school group, a small team). Not a project-management tool, no Trello-style boards.
 
-_Backend only, on purpose: there is no web frontend. The interface is the API reference (Scalar); a terminal client to show the real-time sync is planned (TODO, not started)._
+_Backend only, on purpose: there is no web frontend. The interface is the API reference (Scalar)._
 
 **[Try it live →](https://crew-tasks.grabreu.dev)**
 
-Status: early stage. To-do lists and items are implemented; SignalR is not yet.
+Status: early stage. To-do lists and items with optimistic concurrency are implemented.
 
 ## Tech stack
 
-.NET 10 (ASP.NET Core), modular monolith (Users, Todos, Notifications) with Vertical Slice Architecture · ASP.NET Core Identity + JWT · EF Core + SQL Server · Mediator + FluentValidation + Desfecho · MailKit · .NET Aspire for local orchestration · Scalar · planned: SignalR
+.NET 10 (ASP.NET Core), modular monolith (Users, Todos, Notifications) with Vertical Slice Architecture · ASP.NET Core Identity + JWT · EF Core + SQL Server · Mediator + FluentValidation + Desfecho · MailKit · .NET Aspire for local orchestration · Scalar
 
 ## Features
 
