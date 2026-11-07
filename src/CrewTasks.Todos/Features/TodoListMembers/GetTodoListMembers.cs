@@ -30,17 +30,15 @@ public class GetTodoListMembersHandler(TodosDbContext dbContext) : IQueryHandler
             return Result.NotFound("Todo list not found.");
         }
 
-        var members = await dbContext.TodoListMemberships
+        IReadOnlyList<TodoListMemberDto> members = await dbContext.TodoListMemberships
             .AsNoTracking()
             .Where(x => x.TodoListId == query.TodoListId)
             .OrderBy(x => x.JoinedAt)
             .ThenBy(x => x.UserId)
-            .Select(x => new { x.UserId, x.Role, x.JoinedAt })
+            .Select(x => new TodoListMemberDto(x.UserId, x.Role.ToString(), x.JoinedAt))
             .ToListAsync(cancellationToken);
 
-        IReadOnlyList<TodoListMemberDto> result = [.. members.Select(x => new TodoListMemberDto(x.UserId, x.Role.ToString(), x.JoinedAt))];
-
-        return Result.Success(result);
+        return Result.Success(members);
     }
 }
 
