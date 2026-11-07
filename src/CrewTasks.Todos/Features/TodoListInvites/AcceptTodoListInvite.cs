@@ -1,3 +1,4 @@
+using CrewTasks.Todos.Contracts.Events;
 using CrewTasks.Todos.Data;
 using CrewTasks.Todos.Features.TodoLists;
 
@@ -18,7 +19,7 @@ public class AcceptTodoListInviteValidator : AbstractValidator<AcceptTodoListInv
     }
 }
 
-public class AcceptTodoListInviteHandler(TodosDbContext dbContext) : ICommandHandler<AcceptTodoListInviteCommand, Result<TodoListDto>>
+public class AcceptTodoListInviteHandler(TodosDbContext dbContext, IPublisher publisher) : ICommandHandler<AcceptTodoListInviteCommand, Result<TodoListDto>>
 {
     public async ValueTask<Result<TodoListDto>> Handle(AcceptTodoListInviteCommand command, CancellationToken cancellationToken)
     {
@@ -39,6 +40,8 @@ public class AcceptTodoListInviteHandler(TodosDbContext dbContext) : ICommandHan
             invite.TodoList.AddMember(command.UserId);
 
             await dbContext.SaveChangesAsync(cancellationToken);
+
+            await publisher.Publish(new TodoListMemberJoinedEvent(invite.TodoList.Id, invite.TodoList.Name, invite.TodoList.OwnerId, command.UserId), cancellationToken);
         }
 
         return new TodoListDto(invite.TodoList.Id, invite.TodoList.Name, invite.TodoList.CreatedAt);

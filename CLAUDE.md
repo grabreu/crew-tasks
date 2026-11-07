@@ -59,8 +59,8 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
   - `Features/` - one file per slice, grouped by entity: `TodoLists/` (create, get one, get all, rename, delete), `TodoItems/` (create, get one, get all, change title, complete, reopen, delete), `TodoListInvites/` (create, get all, revoke, accept), and `TodoListMembers/` (get all).
   - `Entities/` - `TodoList`, `TodoListMembership`, `TodoListInvite`, and `TodoItem` (private setters, changed through methods).
   - `Data/` - `TodosDbContext` (schema `Todos`), configurations, EF Core migrations, design-time factory.
-- `src/CrewTasks.Todos.Contracts/` - integration events published by Todos (none yet).
-- `src/CrewTasks.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
+- `src/CrewTasks.Todos.Contracts/` - integration events published by Todos (`TodoListMemberJoinedEvent`, published when someone joins a list through an invite).
+- `src/CrewTasks.Notifications/` - Notifications module: handles Users and Todos events and sends email through an in-memory queue and a background worker (MailKit/SMTP). The member-joined email looks up the owner's email through `IUserDirectory` and never fails the request that triggered it (errors are logged).
 - `src/CrewTasks.AppHost/` - .NET Aspire host for local development: SQL Server container, MailPit, and the API with its configuration.
 - `src/CrewTasks.ServiceDefaults/` - Aspire service defaults (OpenTelemetry, health checks, resilience).
 - `src/CrewTasks.Api/Dockerfile` - API image (built from the repo root as context).

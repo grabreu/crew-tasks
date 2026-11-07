@@ -1,4 +1,5 @@
 global using System.ComponentModel.DataAnnotations;
+global using System.Net;
 global using System.Threading.Channels;
 global using MailKit.Net.Smtp;
 global using MailKit.Security;
