@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace CrewTasks.Api.ExceptionHandling;
 
 public class DbConcurrencyExceptionHandler(IProblemDetailsService problemDetailsService, ILogger<DbConcurrencyExceptionHandler> logger) : IExceptionHandler
