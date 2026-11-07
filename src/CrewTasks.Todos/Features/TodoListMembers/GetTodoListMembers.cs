@@ -1,8 +1,9 @@
 using CrewTasks.Todos.Data;
+using CrewTasks.Users.Contracts;
 
 namespace CrewTasks.Todos.Features.TodoListMembers;
 
-public record TodoListMemberDto(Guid UserId, string Role, DateTimeOffset JoinedAt);
+public record TodoListMemberDto(Guid UserId, string? DisplayName, string Role, DateTimeOffset JoinedAt);
 
 public record GetTodoListMembersQuery(Guid UserId, Guid TodoListId) : IQuery<Result<IReadOnlyList<TodoListMemberDto>>>;
 
@@ -18,7 +19,7 @@ public class GetTodoListMembersValidator : AbstractValidator<GetTodoListMembersQ
     }
 }
 
-public class GetTodoListMembersHandler(TodosDbContext dbContext) : IQueryHandler<GetTodoListMembersQuery, Result<IReadOnlyList<TodoListMemberDto>>>
+public class GetTodoListMembersHandler(TodosDbContext dbContext, IUserDirectory userDirectory) : IQueryHandler<GetTodoListMembersQuery, Result<IReadOnlyList<TodoListMemberDto>>>
 {
     public async ValueTask<Result<IReadOnlyList<TodoListMemberDto>>> Handle(GetTodoListMembersQuery query, CancellationToken cancellationToken)
     {
@@ -30,13 +31,17 @@ public class GetTodoListMembersHandler(TodosDbContext dbContext) : IQueryHandler
             return Result.NotFound("Todo list not found.");
         }
 
-        IReadOnlyList<TodoListMemberDto> members = await dbContext.TodoListMemberships
+        var memberships = await dbContext.TodoListMemberships
             .AsNoTracking()
             .Where(x => x.TodoListId == query.TodoListId)
             .OrderBy(x => x.JoinedAt)
             .ThenBy(x => x.UserId)
-            .Select(x => new TodoListMemberDto(x.UserId, x.Role.ToString(), x.JoinedAt))
+            .Select(x => new { x.UserId, Role = x.Role.ToString(), x.JoinedAt })
             .ToListAsync(cancellationToken);
+
+        var users = await userDirectory.GetUsersAsync(memberships.Select(x => x.UserId), cancellationToken);
+
+        IReadOnlyList<TodoListMemberDto> members = [.. memberships.Select(x => new TodoListMemberDto(x.UserId, users.GetValueOrDefault(x.UserId)?.DisplayName, x.Role, x.JoinedAt))];
 
         return Result.Success(members);
     }
@@ -52,7 +57,7 @@ public static class GetTodoListMembersEndpoint
             .WithTags("TodoListMembers")
             .WithName("GetTodoListMembers")
             .WithSummary("Get Todo List Members")
-            .WithDescription("Retrieves the members of a list the current user belongs to, in the order they joined.")
+            .WithDescription("Retrieves the members of a list the current user belongs to, in the order they joined. The display name is null until the member completes onboarding.")
             .Produces<IReadOnlyList<TodoListMemberDto>>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound);
