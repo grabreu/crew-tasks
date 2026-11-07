@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CrewTasks.Todos.Contracts\CrewTasks.Todos.Contracts.csproj" />
+    <ProjectReference Include="..\CrewTasks.Users.Contracts\CrewTasks.Users.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

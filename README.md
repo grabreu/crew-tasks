@@ -22,7 +22,7 @@ Status: early stage. To-do lists and items with optimistic concurrency are imple
 - **Onboarding**: the display name is set once after the first sign-in.
 - **Current user**
 - **To-do lists**: create, list, rename, and delete lists. The creator is the owner and only the owner can delete; a list you do not belong to responds 404.
-- **Members and invites**: the owner creates invite links (a token valid for 7 days, usable by several people until it expires or is revoked), lists the active ones, and revokes them. Anyone signed in can accept a token to join the list as a member (accepting twice has no effect; an unknown, expired, or revoked token responds 404). Any member can list the members. Non-owners get 403 on invites.
+- **Members and invites**: the owner creates invite links (a token valid for 7 days, usable by several people until it expires or is revoked), lists the active ones, and revokes them. Anyone signed in can accept a token to join the list as a member (accepting twice has no effect; an unknown, expired, or revoked token responds 404). Any member can list the members (user id, display name, role); the email is never exposed. Non-owners get 403 on invites.
 - **To-do items**: create an item in a list, list your items across all your lists (filtered by list or completion), change the title, complete, reopen, and delete. Any member of the list can change its items; an item of a list you do not belong to responds 404.
 - **Optimistic concurrency**: every item carries a `rowVersion`. Changing the title, completing, reopening, and deleting require the current value in the `If-Match` header; a stale value responds 409 and the client reloads the item. The three changes that keep the item return the updated item with its new `rowVersion`.
 
@@ -37,7 +37,7 @@ Status: early stage. To-do lists and items with optimistic concurrency are imple
 | GET | `/todo-lists/{todoListId}` | bearer | Gets a list the current user belongs to. |
 | PUT | `/todo-lists/{todoListId}` | bearer | Renames a list. |
 | DELETE | `/todo-lists/{todoListId}` | bearer | Deletes a list and its items (owner only). |
-| GET | `/todo-lists/{todoListId}/members` | bearer | Lists the members of a list, in join order. |
+| GET | `/todo-lists/{todoListId}/members` | bearer | Lists the members of a list (id, display name, role), in join order. |
 | POST | `/todo-lists/{todoListId}/invites` | bearer | Creates an invite token for a list (owner only). |
 | GET | `/todo-lists/{todoListId}/invites` | bearer | Lists the active invites of a list (owner only). |
 | DELETE | `/todo-lists/{todoListId}/invites/{inviteId}` | bearer | Revokes an invite (owner only). |

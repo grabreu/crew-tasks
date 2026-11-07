@@ -46,7 +46,7 @@ Future-you revisiting this months later, or someone browsing the portfolio to se
 
 .NET (ASP.NET Core) API, Vertical Slice Architecture: one slice per use case, with command/query + handler + endpoint colocated.
 
-Modular monolith: one project per module (plus a `.Contracts` project for what other modules may reference), hosted by `CrewTasks.Api`. Modules talk through events in `*.Contracts`, never by referencing each other's internals.
+Modular monolith: one project per module (plus a `.Contracts` project for what other modules may reference), hosted by `CrewTasks.Api`. Modules talk through events and lookup interfaces in `*.Contracts` (ADR 0007), never by referencing each other's internals.
 
 - `CrewTasks.slnx` - solution.
 - `src/CrewTasks.Api/` - host: `Program.cs`, `ValidationBehavior` (FluentValidation in the Mediator pipeline), exception handlers (`DbConcurrencyExceptionHandler`, then the fallback `GlobalExceptionHandler`), OpenAPI transformers (Scalar).
@@ -54,7 +54,7 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
   - `Features/` - one file per slice: request/command, validator, handler, and endpoint colocated.
   - `Data/` - `UsersDbContext` (schema `Users`), configurations, EF Core migrations, design-time factory.
   - `Identity/`, `Jwt/` - `ApplicationUser`, token issuing.
-- `src/CrewTasks.Users.Contracts/` - integration events published by Users (`EmailSignInStartedEvent`).
+- `src/CrewTasks.Users.Contracts/` - integration events published by Users (`EmailSignInStartedEvent`) and `IUserDirectory`, which resolves user ids to display name and email (implemented in `Users/Identity/UserDirectory.cs`; used by Todos for member names).
 - `src/CrewTasks.Todos/` - Todos module: to-do lists, their memberships (owner/member), and their items.
   - `Features/` - one file per slice, grouped by entity: `TodoLists/` (create, get one, get all, rename, delete), `TodoItems/` (create, get one, get all, change title, complete, reopen, delete), `TodoListInvites/` (create, get all, revoke, accept), and `TodoListMembers/` (get all).
   - `Entities/` - `TodoList`, `TodoListMembership`, `TodoListInvite`, and `TodoItem` (private setters, changed through methods).

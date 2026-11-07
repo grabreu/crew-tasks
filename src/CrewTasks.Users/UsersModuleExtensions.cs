@@ -1,3 +1,4 @@
+using CrewTasks.Users.Contracts;
 using CrewTasks.Users.Data;
 using CrewTasks.Users.Features;
 using CrewTasks.Users.Identity;
@@ -52,6 +53,8 @@ public static class UsersModuleExtensions
         builder.Services.AddAuthorization();
 
         builder.Services.AddSingleton<ITokenService, JwtTokenService>();
+
+        builder.Services.AddScoped<IUserDirectory, UserDirectory>();
 
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
