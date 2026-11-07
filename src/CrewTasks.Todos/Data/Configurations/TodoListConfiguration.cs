@@ -20,5 +20,8 @@ public class TodoListConfiguration : IEntityTypeConfiguration<TodoList>
 
         builder.Navigation(x => x.Items)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Navigation(x => x.Invites)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

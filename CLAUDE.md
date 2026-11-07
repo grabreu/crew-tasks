@@ -56,8 +56,8 @@ Modular monolith: one project per module (plus a `.Contracts` project for what o
   - `Identity/`, `Jwt/` - `ApplicationUser`, token issuing.
 - `src/CrewTasks.Users.Contracts/` - integration events published by Users (`EmailSignInStartedEvent`).
 - `src/CrewTasks.Todos/` - Todos module: to-do lists, their memberships (owner/member), and their items.
-  - `Features/` - one file per slice, grouped by entity: `TodoLists/` (create, get one, get all, rename, delete) and `TodoItems/` (create, get one, get all, change title, complete, reopen, delete).
-  - `Entities/` - `TodoList`, `TodoListMembership`, and `TodoItem` (private setters, changed through methods).
+  - `Features/` - one file per slice, grouped by entity: `TodoLists/` (create, get one, get all, rename, delete), `TodoItems/` (create, get one, get all, change title, complete, reopen, delete), `TodoListInvites/` (create, get all, revoke, accept), and `TodoListMembers/` (get all).
+  - `Entities/` - `TodoList`, `TodoListMembership`, `TodoListInvite`, and `TodoItem` (private setters, changed through methods).
   - `Data/` - `TodosDbContext` (schema `Todos`), configurations, EF Core migrations, design-time factory.
 - `src/CrewTasks.Todos.Contracts/` - integration events published by Todos (none yet).
 - `src/CrewTasks.Notifications/` - Notifications module: handles Users events and sends email through an in-memory queue and a background worker (MailKit/SMTP).
@@ -71,7 +71,7 @@ Commands, queries and events go through `Mediator` (source generator), results u
 
 All modules share one SQL database: each has its own `DbContext` (connection strings `UsersDb`, `TodosDb`), its own schema, and its own `__EFMigrationsHistory` table inside that schema; there are no foreign keys across schemas.
 
-Todo items are a flat resource (`/todo-items`, addressed by their own id); the list id travels in the body on creation and as a filter on listing. Access to a list is checked inside each handler, by querying through the user's membership; a user who is not a member gets 404.
+Todo items are a flat resource (`/todo-items`, addressed by their own id); the list id travels in the body on creation and as a filter on listing. Access to a list is checked inside each handler, by querying through the user's membership; a user who is not a member gets 404. Invites are nested under the list (`/todo-lists/{id}/invites`) and only the owner manages them (403 for members); an invite is a random token valid for 7 days, usable by several people until revoked, and accepting it (`/todo-list-invites/{token}/accept`) adds a `Member` membership, idempotently; unusable tokens get 404.
 
 Item mutations (change title, complete, reopen, delete) require the item's `rowVersion` (SQL Server `rowversion`) in the `If-Match` header: the handler compares it with the loaded value and responds 409 when stale, and `DbConcurrencyExceptionHandler` maps a `DbUpdateConcurrencyException` (a race between load and save) to 409 ahead of the fallback `GlobalExceptionHandler`.
 
