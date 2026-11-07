@@ -49,7 +49,7 @@ Future-you revisiting this months later, or someone browsing the portfolio to se
 Modular monolith: one project per module (plus a `.Contracts` project for what other modules may reference), hosted by `CrewTasks.Api`. Modules talk through events in `*.Contracts`, never by referencing each other's internals.
 
 - `CrewTasks.slnx` - solution.
-- `src/CrewTasks.Api/` - host: `Program.cs`, `ValidationBehavior` (FluentValidation in the Mediator pipeline), `GlobalExceptionHandler`, OpenAPI transformers (Scalar).
+- `src/CrewTasks.Api/` - host: `Program.cs`, `ValidationBehavior` (FluentValidation in the Mediator pipeline), exception handlers (`DbConcurrencyExceptionHandler`, then the fallback `GlobalExceptionHandler`), OpenAPI transformers (Scalar).
 - `src/CrewTasks.Users/` - Users module (ASP.NET Core Identity, JWT, email-code sign-in).
   - `Features/` - one file per slice: request/command, validator, handler, and endpoint colocated.
   - `Data/` - `UsersDbContext` (schema `Users`), configurations, EF Core migrations, design-time factory.
@@ -73,6 +73,8 @@ All modules share one SQL database: each has its own `DbContext` (connection str
 
 Todo items are a flat resource (`/todo-items`, addressed by their own id); the list id travels in the body on creation and as a filter on listing. Access to a list is checked inside each handler, by querying through the user's membership; a user who is not a member gets 404.
 
+Item mutations (change title, complete, reopen, delete) require the item's `rowVersion` (SQL Server `rowversion`) in the `If-Match` header: the handler compares it with the loaded value and responds 409 when stale, and `DbConcurrencyExceptionHandler` maps a `DbUpdateConcurrencyException` (a race between load and save) to 409 ahead of the fallback `GlobalExceptionHandler`.
+
 Auth issues short-lived JWT access tokens only (`AccessTokenExpirationMinutes`, 15 in `appsettings.json`); there is no refresh token by design, the client signs in again with a new email code.
 
 Each module exposes `Add<Module>ModuleServices` and `Map<Module>ModuleEndpoints` extension methods that `Program.cs` calls. Options (`Jwt`, `Email`) are validated on start, so the API does not boot without them.
@@ -84,4 +86,4 @@ Run from the repo root: `dotnet restore`, `dotnet build --no-restore -c Release`
 ### Open Questions
 
 - TODO: terminal client to demonstrate real-time sync (not started; tech to define).
-- TODO: no SignalR yet; lists, memberships, and items exist (milestone 1 of the project's idea draft is done). Next is milestone 2: optimistic concurrency on item mutations.
+- TODO: no SignalR yet; lists, memberships, and items with optimistic concurrency exist (milestones 1 and 2 of the project's idea draft are done). Next is milestone 3: real-time sync with SignalR.

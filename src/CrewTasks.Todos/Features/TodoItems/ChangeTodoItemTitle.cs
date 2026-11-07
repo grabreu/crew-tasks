@@ -1,8 +1,9 @@
 using CrewTasks.Todos.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CrewTasks.Todos.Features.TodoItems;
 
-public record ChangeTodoItemTitleCommand(Guid UserId, Guid TodoItemId, string Title) : ICommand<Result>;
+public record ChangeTodoItemTitleCommand(Guid UserId, Guid TodoItemId, string Title, string RowVersion) : ICommand<Result<TodoItemDto>>;
 
 public class ChangeTodoItemTitleValidator : AbstractValidator<ChangeTodoItemTitleCommand>
 {
@@ -17,12 +18,17 @@ public class ChangeTodoItemTitleValidator : AbstractValidator<ChangeTodoItemTitl
         RuleFor(x => x.Title)
             .NotEmpty()
             .MaximumLength(200);
+
+        RuleFor(x => x.RowVersion)
+            .NotEmpty()
+            .Must(x => Convert.TryFromBase64String(x, new byte[x.Length], out _))
+            .WithMessage("'Row Version' must be the base64 value of the item, sent in the If-Match header.");
     }
 }
 
-public class ChangeTodoItemTitleHandler(TodosDbContext dbContext) : ICommandHandler<ChangeTodoItemTitleCommand, Result>
+public class ChangeTodoItemTitleHandler(TodosDbContext dbContext) : ICommandHandler<ChangeTodoItemTitleCommand, Result<TodoItemDto>>
 {
-    public async ValueTask<Result> Handle(ChangeTodoItemTitleCommand command, CancellationToken cancellationToken)
+    public async ValueTask<Result<TodoItemDto>> Handle(ChangeTodoItemTitleCommand command, CancellationToken cancellationToken)
     {
         var todoItem = await dbContext.TodoItems
             .SingleOrDefaultAsync(x => x.Id == command.TodoItemId && x.TodoList.Memberships.Any(m => m.UserId == command.UserId), cancellationToken);
@@ -32,11 +38,16 @@ public class ChangeTodoItemTitleHandler(TodosDbContext dbContext) : ICommandHand
             return Result.NotFound("Todo item not found.");
         }
 
+        if (!todoItem.RowVersion.SequenceEqual(Convert.FromBase64String(command.RowVersion)))
+        {
+            return Result.Conflict("The todo item was changed by someone else. Reload it and try again.");
+        }
+
         todoItem.ChangeTitle(command.Title);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result.Success();
+        return new TodoItemDto(todoItem.Id, todoItem.TodoListId, todoItem.Title, todoItem.IsCompleted, todoItem.CreatedAt, todoItem.RowVersion);
     }
 }
 
@@ -50,17 +61,18 @@ public static class ChangeTodoItemTitleEndpoint
             .WithTags("TodoItems")
             .WithName("ChangeTodoItemTitle")
             .WithSummary("Change Todo Item Title")
-            .WithDescription("Changes the title of an item of a list the current user belongs to.")
-            .Produces(StatusCodes.Status204NoContent)
+            .WithDescription("Changes the title of an item of a list the current user belongs to. The item's rowVersion must be sent in the If-Match header; a stale value responds 409.")
+            .Produces<TodoItemDto>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
     }
 
-    private static ValueTask<IResult> HandleAsync(Guid todoItemId, ChangeTodoItemTitleRequest request, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
+    private static ValueTask<IResult> HandleAsync(Guid todoItemId, ChangeTodoItemTitleRequest request, [FromHeader(Name = "If-Match")] string? ifMatch, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
     {
         var userId = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return sender.Send(new ChangeTodoItemTitleCommand(userId, todoItemId, request.Title), cancellationToken).ToNoContent();
+        return sender.Send(new ChangeTodoItemTitleCommand(userId, todoItemId, request.Title, ifMatch?.Trim('"') ?? string.Empty), cancellationToken).ToOk();
     }
 
     public record ChangeTodoItemTitleRequest(string Title);

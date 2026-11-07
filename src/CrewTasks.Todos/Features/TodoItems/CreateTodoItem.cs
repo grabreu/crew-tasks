@@ -2,7 +2,7 @@ using CrewTasks.Todos.Data;
 
 namespace CrewTasks.Todos.Features.TodoItems;
 
-public record TodoItemDto(Guid Id, Guid TodoListId, string Title, bool IsCompleted, DateTimeOffset CreatedAt);
+public record TodoItemDto(Guid Id, Guid TodoListId, string Title, bool IsCompleted, DateTimeOffset CreatedAt, byte[] RowVersion);
 
 public record CreateTodoItemCommand(Guid UserId, Guid TodoListId, string Title) : ICommand<Result<TodoItemDto>>;
 
@@ -40,7 +40,7 @@ public class CreateTodoItemHandler(TodosDbContext dbContext) : ICommandHandler<C
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return new TodoItemDto(todoItem.Id, todoItem.TodoListId, todoItem.Title, todoItem.IsCompleted, todoItem.CreatedAt);
+        return new TodoItemDto(todoItem.Id, todoItem.TodoListId, todoItem.Title, todoItem.IsCompleted, todoItem.CreatedAt, todoItem.RowVersion);
     }
 }
 

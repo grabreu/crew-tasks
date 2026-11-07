@@ -23,7 +23,7 @@ public class GetTodoItemHandler(TodosDbContext dbContext) : IQueryHandler<GetTod
         var todoItem = await dbContext.TodoItems
             .AsNoTracking()
             .Where(x => x.Id == query.TodoItemId && x.TodoList.Memberships.Any(m => m.UserId == query.UserId))
-            .Select(x => new TodoItemDto(x.Id, x.TodoListId, x.Title, x.IsCompleted, x.CreatedAt))
+            .Select(x => new TodoItemDto(x.Id, x.TodoListId, x.Title, x.IsCompleted, x.CreatedAt, x.RowVersion))
             .SingleOrDefaultAsync(cancellationToken);
 
         if (todoItem is null)
