@@ -23,6 +23,7 @@ Status: early stage. To-do lists and items are implemented; SignalR is not yet.
 - **Current user**
 - **To-do lists**: create, list, rename, and delete lists. The creator is the owner and only the owner can delete; a list you do not belong to responds 404.
 - **To-do items**: create an item in a list, list your items across all your lists (filtered by list or completion), change the title, complete, reopen, and delete. Any member of the list can change its items; an item of a list you do not belong to responds 404.
+- **Optimistic concurrency**: every item carries a `rowVersion`. Changing the title, completing, reopening, and deleting require the current value in the `If-Match` header; a stale value responds 409 and the client reloads the item. The three changes that keep the item return the updated item with its new `rowVersion`.
 
 | Method | Route | Auth | Purpose |
 | --- | --- | --- | --- |
@@ -38,10 +39,10 @@ Status: early stage. To-do lists and items are implemented; SignalR is not yet.
 | POST | `/todo-items` | bearer | Creates an item in a list (`todoListId` in the body). |
 | GET | `/todo-items` | bearer | Lists the items of the user's lists, oldest first; optional `todoListId` and `isCompleted` filters. |
 | GET | `/todo-items/{todoItemId}` | bearer | Gets an item. |
-| PUT | `/todo-items/{todoItemId}/title` | bearer | Changes the title of an item. |
-| POST | `/todo-items/{todoItemId}/complete` | bearer | Completes an item. |
-| POST | `/todo-items/{todoItemId}/reopen` | bearer | Reopens a completed item. |
-| DELETE | `/todo-items/{todoItemId}` | bearer | Deletes an item. |
+| PUT | `/todo-items/{todoItemId}/title` | bearer | Changes the title of an item (`If-Match` required). |
+| POST | `/todo-items/{todoItemId}/complete` | bearer | Completes an item (`If-Match` required). |
+| POST | `/todo-items/{todoItemId}/reopen` | bearer | Reopens a completed item (`If-Match` required). |
+| DELETE | `/todo-items/{todoItemId}` | bearer | Deletes an item (`If-Match` required). |
 
 ## Development
 

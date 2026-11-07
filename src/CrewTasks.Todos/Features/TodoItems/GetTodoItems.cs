@@ -1,5 +1,4 @@
 using CrewTasks.Todos.Data;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CrewTasks.Todos.Features.TodoItems;
 
@@ -38,7 +37,7 @@ public class GetTodoItemsHandler(TodosDbContext dbContext) : IQueryHandler<GetTo
         IReadOnlyList<TodoItemDto> result = await todoItems
             .OrderBy(x => x.CreatedAt)
             .ThenBy(x => x.Id)
-            .Select(x => new TodoItemDto(x.Id, x.TodoListId, x.Title, x.IsCompleted, x.CreatedAt))
+            .Select(x => new TodoItemDto(x.Id, x.TodoListId, x.Title, x.IsCompleted, x.CreatedAt, x.RowVersion))
             .ToListAsync(cancellationToken);
 
         return Result.Success(result);

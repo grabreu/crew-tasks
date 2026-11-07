@@ -15,6 +15,9 @@ public class TodoItemConfiguration : IEntityTypeConfiguration<TodoItem>
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
+
         builder.HasOne(x => x.TodoList)
             .WithMany(x => x.Items)
             .HasForeignKey(x => x.TodoListId)

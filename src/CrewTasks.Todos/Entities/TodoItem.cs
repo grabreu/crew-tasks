@@ -19,6 +19,7 @@ public class TodoItem
     public string Title { get; private set; } = null!;
     public bool IsCompleted { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
+    public byte[] RowVersion { get; private set; } = null!;
     public TodoList TodoList { get; private set; } = null!;
 
     public void ChangeTitle(string title)

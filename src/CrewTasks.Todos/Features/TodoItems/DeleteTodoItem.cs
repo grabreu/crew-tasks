@@ -2,7 +2,7 @@ using CrewTasks.Todos.Data;
 
 namespace CrewTasks.Todos.Features.TodoItems;
 
-public record DeleteTodoItemCommand(Guid UserId, Guid TodoItemId) : ICommand<Result>;
+public record DeleteTodoItemCommand(Guid UserId, Guid TodoItemId, string RowVersion) : ICommand<Result>;
 
 public class DeleteTodoItemValidator : AbstractValidator<DeleteTodoItemCommand>
 {
@@ -13,6 +13,11 @@ public class DeleteTodoItemValidator : AbstractValidator<DeleteTodoItemCommand>
 
         RuleFor(x => x.TodoItemId)
             .NotEmpty();
+
+        RuleFor(x => x.RowVersion)
+            .NotEmpty()
+            .Must(x => Convert.TryFromBase64String(x, new byte[x.Length], out _))
+            .WithMessage("'Row Version' must be the base64 value of the item, sent in the If-Match header.");
     }
 }
 
@@ -26,6 +31,11 @@ public class DeleteTodoItemHandler(TodosDbContext dbContext) : ICommandHandler<D
         if (todoItem is null)
         {
             return Result.NotFound("Todo item not found.");
+        }
+
+        if (!todoItem.RowVersion.SequenceEqual(Convert.FromBase64String(command.RowVersion)))
+        {
+            return Result.Conflict("The todo item was changed by someone else. Reload it and try again.");
         }
 
         dbContext.TodoItems.Remove(todoItem);
@@ -46,15 +56,17 @@ public static class DeleteTodoItemEndpoint
             .WithTags("TodoItems")
             .WithName("DeleteTodoItem")
             .WithSummary("Delete Todo Item")
-            .WithDescription("Deletes an item of a list the current user belongs to.")
+            .WithDescription("Deletes an item of a list the current user belongs to. The item's rowVersion must be sent in the If-Match header; a stale value responds 409.")
             .Produces(StatusCodes.Status204NoContent)
+            .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
     }
 
-    private static ValueTask<IResult> HandleAsync(Guid todoItemId, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
+    private static ValueTask<IResult> HandleAsync(Guid todoItemId, [FromHeader(Name = "If-Match")] string? ifMatch, ClaimsPrincipal principal, ISender sender, CancellationToken cancellationToken)
     {
         var userId = Guid.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return sender.Send(new DeleteTodoItemCommand(userId, todoItemId), cancellationToken).ToNoContent();
+        return sender.Send(new DeleteTodoItemCommand(userId, todoItemId, ifMatch?.Trim('"') ?? string.Empty), cancellationToken).ToNoContent();
     }
 }
