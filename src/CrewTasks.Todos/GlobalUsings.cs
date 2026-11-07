@@ -1,5 +1,7 @@
+global using System.Buffers.Text;
 global using System.Reflection;
 global using System.Security.Claims;
+global using System.Security.Cryptography;
 global using Desfecho;
 global using FluentValidation;
 global using Mediator;

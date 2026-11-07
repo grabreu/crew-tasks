@@ -4,6 +4,7 @@ public class TodoList
 {
     private readonly List<TodoListMembership> _memberships = [];
     private readonly List<TodoItem> _items = [];
+    private readonly List<TodoListInvite> _invites = [];
 
     private TodoList()
     {
@@ -25,6 +26,7 @@ public class TodoList
     public DateTimeOffset CreatedAt { get; private set; }
     public IReadOnlyCollection<TodoListMembership> Memberships => _memberships;
     public IReadOnlyCollection<TodoItem> Items => _items;
+    public IReadOnlyCollection<TodoListInvite> Invites => _invites;
 
     public void Rename(string name)
     {
@@ -42,5 +44,13 @@ public class TodoList
         _items.Add(item);
 
         return item;
+    }
+
+    public TodoListInvite AddInvite(Guid createdByUserId)
+    {
+        var invite = new TodoListInvite(Id, createdByUserId);
+        _invites.Add(invite);
+
+        return invite;
     }
 }

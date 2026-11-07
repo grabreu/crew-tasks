@@ -1,5 +1,7 @@
 using CrewTasks.Todos.Data;
 using CrewTasks.Todos.Features.TodoItems;
+using CrewTasks.Todos.Features.TodoListInvites;
+using CrewTasks.Todos.Features.TodoListMembers;
 using CrewTasks.Todos.Features.TodoLists;
 
 namespace CrewTasks.Todos;
@@ -32,6 +34,11 @@ public static class TodosModuleExtensions
         endpoints.MapCompleteTodoItemEndpoint();
         endpoints.MapReopenTodoItemEndpoint();
         endpoints.MapDeleteTodoItemEndpoint();
+        endpoints.MapGetTodoListMembersEndpoint();
+        endpoints.MapCreateTodoListInviteEndpoint();
+        endpoints.MapGetTodoListInvitesEndpoint();
+        endpoints.MapRevokeTodoListInviteEndpoint();
+        endpoints.MapAcceptTodoListInviteEndpoint();
 
         return endpoints;
     }
