@@ -35,6 +35,7 @@ public static class TodosModuleExtensions
         endpoints.MapReopenTodoItemEndpoint();
         endpoints.MapDeleteTodoItemEndpoint();
         endpoints.MapGetTodoListMembersEndpoint();
+        endpoints.MapRemoveTodoListMemberEndpoint();
         endpoints.MapCreateTodoListInviteEndpoint();
         endpoints.MapGetTodoListInvitesEndpoint();
         endpoints.MapRevokeTodoListInviteEndpoint();
