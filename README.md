@@ -10,8 +10,6 @@ _Backend only, on purpose: there is no web frontend. The interface is the API re
 
 **[Try it live →](https://crew-tasks.grabreu.dev)**
 
-Status: early stage. To-do lists and items with optimistic concurrency are implemented.
-
 ## Tech stack
 
 .NET 10 (ASP.NET Core), modular monolith (Users, Todos, Notifications) with Vertical Slice Architecture · ASP.NET Core Identity + JWT · EF Core + SQL Server · Mediator + FluentValidation + Desfecho · MailKit · .NET Aspire for local orchestration · Scalar
